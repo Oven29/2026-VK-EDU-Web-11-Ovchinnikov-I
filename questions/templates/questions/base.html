@@ -1,0 +1,92 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Ivan Ask{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'questions/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'questions/css/main.css' %}">
+    <link rel="icon" type="image/png" href="{% static 'questions/img/favicon.png' %}">
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom mb-4">
+        <div class="container">
+            <a class="navbar-brand fw-bold fs-3" href="{% url 'index' %}">
+                <img src="{% static 'questions/img/favicon.png' %}" alt="favicon" width="32" height="32"
+                    class="d-inline-block align-top mt-1">
+                Ivan Ask
+            </a>
+
+            <div class="d-flex flex-grow-1 mx-4">
+                <input class="form-control me-2" type="search" placeholder="Search">
+                <button class="btn btn-outline-primary" type="submit">Search</button>
+            </div>
+            <div class="d-flex align-items-center">
+                <a href="{% url 'ask' %}" class="btn btn-primary me-3 fw-bold">ASK!</a>
+                <div class="d-flex align-items-center">
+                    <div class="avatar-box me-2 d-flex align-items-center justify-content-center"
+                        style="width: 40px; height: 40px;">
+                        <small>Img</small>
+                    </div>
+                    <div>
+                        <div class="fw-bold" style="font-size: 0.85rem;">Ivan Ovchinnikov</div>
+                        <div style="font-size: 0.75rem;">
+                            <a href="{% url 'profile' %}" class="text-decoration-none">settings</a>
+                            <a href="#" class="text-decoration-none ms-1 text-danger">log out</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container">
+        <div class="row">
+            <div class="col-lg-9 col-md-8 col-12">
+                {% block content %}{% endblock %}
+            </div>
+
+            <aside class="col-lg-3 col-md-4 col-12">
+                <div class="mb-5">
+                    <h3 class="sidebar-title">Popular Tags</h3>
+                    <div class="tag-cloud fw-bold">
+                        <a href="{% url 'tag' '213' %}" class="text-decoration-none text-secondary">perl</a>
+                        <a href="{% url 'tag' '213' %}" class="text-decoration-none text-danger">python</a>
+                        <a href="{% url 'tag' '213' %}" class="text-decoration-none text-dark">TechnoPark</a>
+                        <a href="{% url 'tag' '213' %}" class="text-decoration-none text-primary">MySQL</a>
+                        <a href="{% url 'tag' '213' %}" class="text-decoration-none text-success">django</a>
+                        <a href="{% url 'tag' '213' %}" class="text-decoration-none text-info">Mail.Ru</a>
+                        <a href="{% url 'tag' '213' %}" class="text-decoration-none text-warning">Firefox</a>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="sidebar-title">Best Members</h3>
+                    <ul class="list-unstyled">
+                        <li><a href="#" class="text-decoration-none">Ivan O.</a></li>
+                        <li><a href="#" class="text-decoration-none">Andrew D.</a></li>
+                        <li><a href="#" class="text-decoration-none">Anton D.</a></li>
+                        <li><a href="#" class="text-decoration-none">Semen L.</a></li>
+                        <li><a href="#" class="text-decoration-none">Genadyw</a></li>
+                    </ul>
+                </div>
+            </aside>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container text-center text-muted">
+            &copy; 2026 VK Education Web Course
+        </div>
+    </footer>
+
+    <script src="{% static 'questions/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'questions/js/jquery-4.0.0.min.js' %}"></script>
+    <script src="{% static 'questions/js/main.js' %}"></script>
+</body>
+
+</html>
