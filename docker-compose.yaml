@@ -1,0 +1,15 @@
+services:
+  app:
+    container_name: IvanAsk
+    build:
+      context: .
+    restart: unless-stopped
+    command: >
+      python manage.py runserver 0.0.0.0:8000
+    volumes:
+    - ivan-ask:/data
+    ports:
+    - "8000:8000"
+
+volumes:
+  ivan-ask:
