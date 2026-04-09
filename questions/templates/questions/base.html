@@ -54,13 +54,9 @@
                 <div class="mb-5">
                     <h3 class="sidebar-title">Popular Tags</h3>
                     <div class="tag-cloud fw-bold">
-                        <a href="{% url 'tag' '213' %}" class="text-decoration-none text-secondary">perl</a>
-                        <a href="{% url 'tag' '213' %}" class="text-decoration-none text-danger">python</a>
-                        <a href="{% url 'tag' '213' %}" class="text-decoration-none text-dark">TechnoPark</a>
-                        <a href="{% url 'tag' '213' %}" class="text-decoration-none text-primary">MySQL</a>
-                        <a href="{% url 'tag' '213' %}" class="text-decoration-none text-success">django</a>
-                        <a href="{% url 'tag' '213' %}" class="text-decoration-none text-info">Mail.Ru</a>
-                        <a href="{% url 'tag' '213' %}" class="text-decoration-none text-warning">Firefox</a>
+                        {% for tag in tags %}
+                        <a href="{% url 'tag' tag %}" class="text-decoration-none text-primary">{{ tag }}</a>
+                        {% endfor %}
                     </div>
                 </div>
 
