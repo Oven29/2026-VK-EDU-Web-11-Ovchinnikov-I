@@ -7,9 +7,10 @@ services:
     command: >
       python manage.py runserver 0.0.0.0:8000
     volumes:
-    - ivan-ask:/data
+      - .:/app
+      - django_media:/app/media
     ports:
-    - "8000:8000"
+      - "8000:8000"
 
 volumes:
-  ivan-ask:
+  django_media:
