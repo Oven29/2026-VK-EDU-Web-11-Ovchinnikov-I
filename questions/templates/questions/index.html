@@ -21,11 +21,7 @@
                 <span>{{ q.author }}</span>
             </div>
 
-            <div class="vote-widget mx-auto p-0 mt-3">
-                <div class="fw-bold me-1 vote-count">{{ q.rating }}</div>
-                <span class="vote-btn me-1" data-action="up">▲</span>
-                <span class="vote-btn" data-action="down">▼</span>
-            </div>
+            {% include 'questions/components/rating.html' with rating=q.rating %}
 
         </div>
         <div class="col-10">
@@ -49,46 +45,6 @@
 </div>
 {% endfor %}
 
-<nav aria-label="Page navigation" class="mt-4">
-    <ul class="pagination">
-        {% if questions.has_previous %}
-            <li class="page-item">
-                <a class="page-link" href="?page={{ questions.previous_page_number }}">&laquo;</a>
-            </li>
-        {% endif %}
-
-        {% for num in questions.paginator.page_range %}
-            
-            {% if num == 1 %}
-                <li class="page-item {% if questions.number == num %}active{% endif %}">
-                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
-                </li>
-
-            {% elif num > questions.number|add:'-2' and num < questions.number|add:'2' %}
-                {% if num != 1 and num != questions.paginator.num_pages %}
-                    <li class="page-item {% if questions.number == num %}active{% endif %}">
-                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
-                    </li>
-                {% endif %}
-
-            {% elif num == questions.number|add:'-2' and num > 1 %}
-                <li class="page-item disabled"><span class="page-link">...</span></li>
-            {% elif num == questions.number|add:'2' and num < questions.paginator.num_pages %}
-                <li class="page-item disabled"><span class="page-link">...</span></li>
-            {% elif num == questions.paginator.num_pages %}
-                <li class="page-item {% if questions.number == num %}active{% endif %}">
-                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
-                </li>
-            {% endif %}
-
-        {% endfor %}
-
-        {% if questions.has_next %}
-            <li class="page-item">
-                <a class="page-link" href="?page={{ questions.next_page_number }}">&raquo;</a>
-            </li>
-        {% endif %}
-    </ul>
-</nav>
+{% include 'questions/components/nav.html' with page=questions %}
 
 {% endblock %}

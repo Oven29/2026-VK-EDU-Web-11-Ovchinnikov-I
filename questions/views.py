@@ -51,7 +51,6 @@ def question(request, pk: int):
         return redirect('index')
 
     page_obj = paginate(ANSWERS, request, per_page=5)
-    print(ANSWERS)
     context = {
         'question': question,
         'answers': page_obj,
