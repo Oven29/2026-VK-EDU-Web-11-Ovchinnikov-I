@@ -63,11 +63,9 @@
                 <div>
                     <h3 class="sidebar-title">Best Members</h3>
                     <ul class="list-unstyled">
-                        <li><a href="#" class="text-decoration-none">Ivan O.</a></li>
-                        <li><a href="#" class="text-decoration-none">Andrew D.</a></li>
-                        <li><a href="#" class="text-decoration-none">Anton D.</a></li>
-                        <li><a href="#" class="text-decoration-none">Semen L.</a></li>
-                        <li><a href="#" class="text-decoration-none">Genadyw</a></li>
+                        {% for member in best_members %}
+                            <li><a href="{{ member.profile_path }}" class="text-decoration-none">{{ member.name }}</a></li>
+                        {% endfor %}
                     </ul>
                 </div>
             </aside>

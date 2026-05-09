@@ -3,8 +3,8 @@ from .utils import paginate
 
 
 TAGS = [
-    'Python', 'Django', 'JavaScript', 'Docker', 'BMSTU', 
-    'PostgreSQL', 'Go', 'React', 'Algorithms', 'WebRTC', 
+    'Python', 'Django', 'JavaScript', 'Docker', 'BMSTU',
+    'PostgreSQL', 'Go', 'React', 'Algorithms', 'WebRTC',
     'CSS', 'HTML', 'Linux', 'SQLAlchemy', 'Git'
 ]
 
@@ -26,11 +26,27 @@ for i in range(1, 41):
         'title': f'How to solve problem #{i}?',
         'content': f'Full description for question number {i}. I am having trouble with my implementation in the lab work. Any suggestions?',
         'author': f'Ivan_{i}',
-        'created_at': f'2026-03-{ (i % 30) + 1:02d}',
+        'created_at': f'2026-03-{(i % 30) + 1:02d}',
         'tags': [TAGS[i % len(TAGS)], TAGS[(i + 1) % len(TAGS)]],
         'rating': i * 3 - 10,
         'answers_count': i % 7,
     })
+
+
+BEST_MEMBERS = [
+    {
+        "name": "Ivan. O",
+        "profile_path": "#",
+    },
+    {
+        "name": "Gazan G.",
+        "profile_path": "#67",
+    },
+    {
+        "name": "Anton Chufashin",
+        "profile_path": "#",
+    }
+]
 
 
 def index(request):
@@ -38,6 +54,7 @@ def index(request):
     context = {
         'questions': page_obj,
         'tags': TAGS[:10],
+        'best_members': BEST_MEMBERS,
     }
 
     return render(request, 'questions/index.html', context)
@@ -54,13 +71,18 @@ def question(request, pk: int):
         'question': question,
         'answers': page_obj,
         'tags': TAGS[:10],
+        'best_members': BEST_MEMBERS,
     }
-    
+
     return render(request, 'questions/question.html', context)
 
 
 def ask(request):
-    return render(request, 'questions/ask.html')
+    context = {
+        'best_members': BEST_MEMBERS,
+    }
+
+    return render(request, 'questions/ask.html', context)
 
 
 def tag(request, tag: str):
@@ -70,9 +92,10 @@ def tag(request, tag: str):
         'questions': page_obj,
         'tag': tag,
         'tags': TAGS[:10],
-        'title': f'Tag: {tag}'
+        'title': f'Tag: {tag}',
+        'best_members': BEST_MEMBERS,
     }
-    
+
     return render(request, 'questions/index.html', context)
 
 
@@ -83,7 +106,8 @@ def hot(request):
         'questions': page_obj,
         'tags': TAGS[:10],
         'hot': True,
-        'title': 'Hot Questions'
+        'title': 'Hot Questions',
+        'best_members': BEST_MEMBERS,
     }
 
     return render(request, 'questions/index.html', context)
