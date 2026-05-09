@@ -38,7 +38,6 @@ def index(request):
     context = {
         'questions': page_obj,
         'tags': TAGS[:10],
-        'title': 'Ivan Ask'
     }
 
     return render(request, 'questions/index.html', context)

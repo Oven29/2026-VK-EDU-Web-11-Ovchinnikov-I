@@ -1,7 +1,7 @@
 {% extends 'questions/base.html' %}
 
 {% if tag or hot %}
-{% block title %}{{ title }}{% endblock %}
+{% block title %}{{ block.super }}: {{ title }}{% endblock %}
 {% endif %}
 
 {% block content %}
