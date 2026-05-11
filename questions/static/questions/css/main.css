@@ -16,6 +16,7 @@ a {
     text-decoration: none;
     color: inherit;
     font-weight: 500;
+    cursor: pointer;
 }
 
 a:hover {
@@ -86,25 +87,66 @@ a:hover {
 }
 
 .vote-widget {
-    width: 60px;
-    text-align: center;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    padding: 5px;
     display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    width: 40px;
+}
+
+.vote-count {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--bs-emphasis-color);
 }
 
 .vote-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 25px;
+    height: 25px;
+
+    border-radius: 30%;
+    border: 1px solid var(--bs-border-color);
+    background-color: var(--bs-light);
+    color: var(--bs-secondary-color);
+
     cursor: pointer;
     user-select: none;
-    transition: color 0.2s;
+    font-weight: bold;
+    font-size: 1.2rem;
+    line-height: 1;
+    transition: all 0.2s ease;
+    padding-bottom: 4px;
 }
 
-.vote-btn.active {
-    font-weight: bold;
-    opacity: 1;
+.vote-up:hover,
+.vote-down:hover {
+    transform: translateY(-2px);
+}
+
+.vote-up:hover {
+    border-color: var(--bs-success);
+    color: var(--bs-success) !important;
+}
+
+.vote-down:hover {
+    border-color: var(--bs-danger);
+    color: var(--bs-danger) !important;
+}
+
+.vote-up.active {
+    background-color: var(--bs-success-bg-subtle);
+    border-color: var(--bs-success);
+    color: var(--bs-success) !important;
+}
+
+.vote-down.active {
+    background-color: var(--bs-danger-bg-subtle);
+    border-color: var(--bs-danger);
+    color: var(--bs-danger) !important;
 }
 
 .avatar-box {
