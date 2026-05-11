@@ -27,6 +27,24 @@ main {
     padding: 15px;
     margin-bottom: 20px;
     border-radius: 5px;
+
+
+.question-title,
+.question-content {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    word-break: break-word;
+}
+
+.question-title {
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+}
+
+.question-content {
+    -webkit-line-clamp: 4;
+    line-clamp: 4;
 }
 
 .vote-widget {

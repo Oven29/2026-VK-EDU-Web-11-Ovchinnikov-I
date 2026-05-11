@@ -25,10 +25,10 @@
 
         </div>
         <div class="col-10">
-            <h3><a href="{% url 'question' q.id %}" class="text-decoration-none">
+            <h3><a href="{% url 'question' q.id %}" class="text-decoration-none question-title">
                     {{ q.title }}
                 </a></h3>
-            <p class="text-muted">{{ q.content|truncatewords:20 }}</p>
+            <p class="text-muted question-content">{{ q.content }}</p>
             <div class="d-flex align-items-center mt-3">
                 <a href="{% url 'question' 1 %}" class="me-3 text-decoration-underline">answer (3)</a>
                 <span class="me-2">Tags:</span>
