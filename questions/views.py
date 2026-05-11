@@ -11,7 +11,11 @@ TAGS = [
 ANSWERS = [
     {
         'content': f'Answer body for question. This is a very helpful solution #{i}',
-        'author': f'User_{i}',
+        'author': {
+            'name': f'User_{i}',
+            "profile_path": "#",
+            "profile_photo": "https://i.yapx.ru/dkv1w.jpg",
+        },
         'created_at': '2026-04-08',
         'is_correct': i % 5 == 0,
         'rating': i * 2
@@ -25,12 +29,18 @@ for i in range(1, 41):
         'id': i,
         'title': f'How to solve problem #{i}?',
         'content': f'Full description for question number {i}. I am having trouble with my implementation in the lab work. Any suggestions?',
-        'author': f'Ivan_{i}',
+        'author': {
+            'name': f'Ivan_{i}',
+            "profile_path": "#",
+            "profile_photo": "https://i.yapx.ru/dkv1w.jpg",
+        },
         'created_at': f'2026-03-{(i % 30) + 1:02d}',
         'tags': [TAGS[i % len(TAGS)], TAGS[(i + 1) % len(TAGS)]],
         'rating': i * 3 - 10,
         'answers_count': i % 7,
     })
+
+QUESTIONS[2]["tags"] = TAGS
 
 
 BEST_MEMBERS = [

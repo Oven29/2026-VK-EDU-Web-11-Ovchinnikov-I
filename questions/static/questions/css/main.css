@@ -34,7 +34,9 @@ a:hover {
 }
 
 .tag {
+    white-space: nowrap;
     display: inline-block;
+
     padding: 0.25rem 0.85rem;
     margin: 0.2rem;
 
@@ -154,6 +156,13 @@ a:hover {
     height: 80px;
     background: #eee;
     border: 1px solid #ddd;
+}
+
+.avatar-box-sm {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+    border-radius: 30%;
 }
 
 footer {
