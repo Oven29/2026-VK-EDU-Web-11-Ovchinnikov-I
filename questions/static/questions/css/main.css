@@ -58,16 +58,19 @@ a:hover {
     transform: translateY(-1px);
 }
 
-.question-card {
+.question-card,
+.answer-card {
     border: 1px solid var(--secondary-color);
     padding: 15px;
     margin-bottom: 20px;
     border-radius: 5px;
     transition: shadow 0.2s ease;
+    word-break: break-word;
 }
 
-.question-card:hover {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+.question-card:hover,
+.answer-card:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .question-title,
@@ -152,10 +155,12 @@ a:hover {
 }
 
 .avatar-box {
-    width: 80px;
-    height: 80px;
+    width: 45px;
+    height: 45px;
     background: #eee;
     border: 1px solid #ddd;
+    border-radius: 30%;
+    flex-shrink: 0;
 }
 
 .avatar-box-sm {
@@ -170,13 +175,6 @@ footer {
     border-top: 1px solid var(--secondary-color);
     padding: 20px 0;
     margin-top: 40px;
-}
-
-.answer-card {
-    border: 1px solid var(--secondary-color);
-    padding: 15px;
-    margin-bottom: 20px;
-    border-radius: 5px;
 }
 
 .correct-answer {

@@ -58,10 +58,17 @@ BEST_MEMBERS = [
     }
 ]
 
+ME = {
+    "name": "Ivan. O",
+    "profile_path": "#",
+    "profile_photo": "https://i.yapx.ru/dkv1w.jpg",
+}
+
 
 def index(request):
     page_obj = paginate(QUESTIONS, request, per_page=10)
     context = {
+        'me': ME,
         'questions': page_obj,
         'tags': TAGS[:10],
         'best_members': BEST_MEMBERS,
@@ -78,6 +85,7 @@ def question(request, pk: int):
 
     page_obj = paginate(ANSWERS, request, per_page=5)
     context = {
+        'me': ME,
         'question': question,
         'answers': page_obj,
         'tags': TAGS[:10],
@@ -89,6 +97,7 @@ def question(request, pk: int):
 
 def ask(request):
     context = {
+        'me': ME,
         'best_members': BEST_MEMBERS,
     }
 
@@ -99,6 +108,7 @@ def tag(request, tag: str):
     questions = [q for q in QUESTIONS if tag in q['tags']]
     page_obj = paginate(questions, request, per_page=10)
     context = {
+        'me': ME,
         'questions': page_obj,
         'tag': tag,
         'tags': TAGS[:10],
@@ -113,6 +123,7 @@ def hot(request):
     questions = sorted(QUESTIONS, key=lambda q: q['rating'], reverse=True)
     page_obj = paginate(questions, request, per_page=10)
     context = {
+        'me': ME,
         'questions': page_obj,
         'tags': TAGS[:10],
         'hot': True,

@@ -22,4 +22,13 @@ def signup(request):
 
 
 def profile(request):
-    return render(request, 'core/profile.html', COMMON_CONTEXT)
+    context = {
+        'me': {
+            'name': "Ivan. O",
+            "profile_path": "#",
+            "profile_photo": "https://i.yapx.ru/dkv1w.jpg",
+        },
+    }
+    context.update(**COMMON_CONTEXT)
+
+    return render(request, 'core/profile.html', context)
