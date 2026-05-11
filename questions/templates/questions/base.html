@@ -55,7 +55,7 @@
                     <h3 class="sidebar-title">Popular Tags</h3>
                     <div class="tag-cloud fw-bold">
                         {% for tag in tags %}
-                        <a href="{% url 'tag' tag %}" class="text-decoration-none text-primary">{{ tag }}</a>
+                        <a href="{% url 'tag' tag %}" class="text-decoration-none tag">{{ tag }}</a>
                         {% endfor %}
                     </div>
                 </div>

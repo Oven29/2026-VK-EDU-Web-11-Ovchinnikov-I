@@ -6,9 +6,8 @@
 <div class="question-card mb-5">
     <div class="row">
         <div class="col-2 text-center">
-            <div class="avatar-box mx-auto mb-2 d-flex align-items-center justify-content-center"><span>
-                    {{ question.author }}
-                </span>
+            <div class="avatar-box mx-auto mb-2 d-flex align-items-center justify-content-center">
+                <span>{{ question.author }}</span>
             </div>
 
             {% include 'questions/components/rating.html' with rating=question.rating %}

@@ -8,7 +8,7 @@
 <div class="d-flex align-items-baseline mb-4">
     <h2 class="me-3">{{ title }}</h2>
     {% if not tag and not hot %}
-    <a href="{% url 'hot' %}" class="text-decoration-none">Hot Questions</a>
+    <a href="{% url 'hot' %}" class="text-decoration-none"><u>Hot Questions</u></a>
     {% endif %}
 </div>
 
@@ -33,7 +33,7 @@
                 <a href="{% url 'question' 1 %}" class="me-3 text-decoration-underline">answer (3)</a>
                 <span class="me-2">Tags:</span>
                 {% for tag in q.tags %}
-                <a href="{% url 'tag' tag %}" class="me-2 text-decoration-none">{{ tag }}</a>
+                <a href="{% url 'tag' tag %}" class="me-2 tag">{{ tag }}</a>
                 {% endfor %}
             </div>
 
