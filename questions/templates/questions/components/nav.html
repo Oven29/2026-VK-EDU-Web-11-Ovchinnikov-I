@@ -8,26 +8,32 @@
 
         {% for num in page.paginator.page_range %}
             
+            {# 1. Всегда показываем первую страницу #}
             {% if num == 1 %}
                 <li class="page-item {% if page.number == num %}active{% endif %}">
                     <a class="page-link" href="?page={{ num }}">{{ num }}</a>
                 </li>
 
-            {% elif num > page.number|add:'-2' and num < page.number|add:'2' %}
-                {% if num != 1 and num != page.paginator.num_pages %}
-                    <li class="page-item {% if page.number == num %}active{% endif %}">
-                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
-                    </li>
-                {% endif %}
-
-            {% elif num == page.number|add:'-2' and num > 1 %}
-                <li class="page-item disabled"><span class="page-link">...</span></li>
-            {% elif num == page.number|add:'2' and num < page.paginator.num_pages %}
-                <li class="page-item disabled"><span class="page-link">...</span></li>
+            {# 2. Всегда показываем последнюю страницу #}
             {% elif num == page.paginator.num_pages %}
                 <li class="page-item {% if page.number == num %}active{% endif %}">
                     <a class="page-link" href="?page={{ num }}">{{ num }}</a>
                 </li>
+
+            {# 3. Показываем текущую и соседние (диапазон +-1) #}
+            {% elif num > page.number|add:'-2' and num < page.number|add:'2' %}
+                <li class="page-item {% if page.number == num %}active{% endif %}">
+                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                </li>
+
+            {# 4. Рисуем многоточие слева #}
+            {% elif num == page.number|add:'-2' and num > 1 %}
+                <li class="page-item disabled"><span class="page-link">...</span></li>
+
+            {# 5. Рисуем многоточие справа #}
+            {% elif num == page.number|add:'2' and num < page.paginator.num_pages %}
+                <li class="page-item disabled"><span class="page-link">...</span></li>
+
             {% endif %}
 
         {% endfor %}
