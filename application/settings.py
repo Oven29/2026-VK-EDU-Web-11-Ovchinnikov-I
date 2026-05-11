@@ -119,3 +119,16 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
+
+if DEBUG:
+    # Добавляем приложение
+    INSTALLED_APPS += ['debug_toolbar']
+
+    # Добавляем Middleware (важно: должен быть как можно выше)
+    MIDDLEWARE = [
+        'debug_toolbar.middleware.DebugToolbarMiddleware'] + MIDDLEWARE
+
+    # Настройка внутренних IP (чтобы панель показывалась на локалке)
+    INTERNAL_IPS = [
+        "127.0.0.1",
+    ]
