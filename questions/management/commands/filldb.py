@@ -1,6 +1,7 @@
 import random
 from django.core.management.base import BaseCommand, CommandError
 from django.contrib.auth.models import User
+from django.contrib.auth.hashers import make_password
 from django.db.models import Sum, OuterRef, Subquery
 from django.db.models.functions import Coalesce
 from faker import Faker
@@ -61,7 +62,7 @@ class Command(BaseCommand):
                 first_name=self.faker.first_name(),
                 last_name=self.faker.last_name(),
                 email=self.faker.email(),
-                password=self.faker.password(),
+                password=make_password(self.faker.password()),
             ))
         User.objects.bulk_create(
             users_to_create, batch_size=10000, ignore_conflicts=True)
