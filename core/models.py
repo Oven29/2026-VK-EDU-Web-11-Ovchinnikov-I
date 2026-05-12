@@ -20,6 +20,13 @@ class Profile(models.Model):
     def __str__(self):
         return f'Профиль {self.user.username}'
 
+    @property
+    def name(self):
+        if not self.user.first_name:
+            return self.user.username
+        return self.user.first_name + \
+            (f' {self.user.last_name[0]}.' if self.user.last_name else '')
+
     class Meta:
         verbose_name = 'Профиль'
         verbose_name_plural = 'Профили'

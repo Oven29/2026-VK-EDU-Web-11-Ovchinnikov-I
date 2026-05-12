@@ -53,8 +53,8 @@
                 <div class="mb-5">
                     <h3 class="sidebar-title">Popular Tags</h3>
                     <div class="tag-cloud fw-bold">
-                        {% for tag in tags %}
-                        <a href="{% url 'tag' tag %}" class="text-decoration-none tag">{{ tag }}</a>
+                        {% for tag in popular_tags %}
+                        <a href="{% url 'tag' tag.name %}" class="text-decoration-none tag">{{ tag }}</a>
                         {% endfor %}
                     </div>
                 </div>
@@ -63,7 +63,7 @@
                     <h3 class="sidebar-title">Best Members</h3>
                     <ul class="list-unstyled">
                         {% for member in best_members %}
-                        <li><a href="{{ member.profile_path }}" class="text-decoration-none">{{ member.name }}</a></li>
+                        <li><a href="#" class="text-decoration-none">{{ member.name }}</a></li>
                         {% endfor %}
                     </ul>
                 </div>

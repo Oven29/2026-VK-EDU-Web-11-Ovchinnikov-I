@@ -1,24 +1,12 @@
 from django.shortcuts import render
 
 
-BEST_MEMBERS = [
-    {
-        "name": "Ivan. O",
-        "profile_path": "#67",
-    },
-]
-
-COMMON_CONTEXT = {
-    'best_members': BEST_MEMBERS,
-}
-
-
 def login(request):
-    return render(request, 'core/login.html', COMMON_CONTEXT)
+    return render(request, 'core/login.html')
 
 
 def signup(request):
-    return render(request, 'core/signup.html', COMMON_CONTEXT)
+    return render(request, 'core/signup.html')
 
 
 def profile(request):
@@ -29,6 +17,5 @@ def profile(request):
             "profile_photo": "https://i.yapx.ru/dkv1w.jpg",
         },
     }
-    context.update(**COMMON_CONTEXT)
 
     return render(request, 'core/profile.html', context)
