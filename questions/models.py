@@ -77,7 +77,8 @@ class LikeAbstract(models.Model):
         default=LIKE,
         verbose_name='Значение'
     )
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(
+        auto_now_add=True, verbose_name='Дата создания')
 
     class Meta:
         abstract = True

@@ -45,13 +45,13 @@ class AnswerAdmin(admin.ModelAdmin):
 
 @admin.register(QuestionLike)
 class QuestionLikeAdmin(admin.ModelAdmin):
-    list_display = ('user', 'question', 'value')
+    list_display = ('user', 'question', 'value', 'created_at')
     list_filter = ('value',)
     raw_id_fields = ('user', 'question')
 
 
 @admin.register(AnswerLike)
 class AnswerLikeAdmin(admin.ModelAdmin):
-    list_display = ('user', 'answer', 'value')
+    list_display = ('user', 'answer', 'value', 'created_at')
     list_filter = ('value',)
     raw_id_fields = ('user', 'answer')
