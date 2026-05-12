@@ -3,4 +3,8 @@ run:
 
 migrate:
 	python manage.py migrate
-# python manage.py makemigrations
+
+RATIO ?= 100
+
+filldb:
+	python manage.py filldb $(RATIO)
