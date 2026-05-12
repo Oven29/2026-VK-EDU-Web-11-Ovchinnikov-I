@@ -15,3 +15,5 @@ media/
 *.log
 
 .env
+.env.*
+!.env.example
