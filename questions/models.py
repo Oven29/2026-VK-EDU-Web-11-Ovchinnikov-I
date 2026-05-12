@@ -1,3 +1,5 @@
+import re
+
 from django.db import models
 from django.contrib.auth.models import User
 
@@ -11,7 +13,8 @@ class Tag(models.Model):
     objects = TagManager()
 
     def __str__(self):
-        return f'Тег {self.name}'
+        # Отсекаю номер чтобы при тестовых данных это уродливо не выглядело
+        return re.sub(r'_\d+$', '', self.name)
 
     class Meta:
         verbose_name = 'Тег'
@@ -40,7 +43,7 @@ class Question(models.Model):
 
 
 class Answer(models.Model):
-    text = models.TextField(verbose_name='Текст')
+    content = models.TextField(verbose_name='Контент')
     author = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='answers', verbose_name='Автор')
     question = models.ForeignKey(

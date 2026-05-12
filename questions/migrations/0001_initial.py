@@ -45,7 +45,7 @@ class Migration(migrations.Migration):
             name='Answer',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('text', models.TextField(verbose_name='Текст')),
+                ('content', models.TextField(verbose_name='Контент')),
                 ('is_correct', models.BooleanField(default=False, verbose_name='Правильный ответ')),
                 ('rating', models.IntegerField(default=0, verbose_name='Рейтинг')),
                 ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')),

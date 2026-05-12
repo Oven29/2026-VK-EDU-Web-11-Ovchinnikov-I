@@ -7,7 +7,7 @@ class AnswerInline(admin.TabularInline):
     model = Answer
     extra = 0
     raw_id_fields = ('author',)
-    fields = ('author', 'text', 'is_correct', 'rating', 'created_at')
+    fields = ('author', 'content', 'is_correct', 'rating', 'created_at')
     readonly_fields = ('created_at',)
 
 
@@ -22,7 +22,7 @@ class TagAdmin(admin.ModelAdmin):
 class QuestionAdmin(admin.ModelAdmin):
     list_display = ('id', 'title', 'author', 'rating', 'created_at')
     list_filter = ('created_at', 'tags')
-    search_fields = ('title', 'text')
+    search_fields = ('title', 'content')
     raw_id_fields = ('author',)
     filter_horizontal = ('tags',)
     inlines = [AnswerInline]
@@ -36,7 +36,7 @@ class QuestionAdmin(admin.ModelAdmin):
 class AnswerAdmin(admin.ModelAdmin):
     list_display = ('id', 'question', 'author', 'is_correct', 'rating', 'created_at')
     list_filter = ('is_correct', 'created_at')
-    search_fields = ('text',)
+    search_fields = ('content',)
     raw_id_fields = ('author', 'question')
 
     def get_queryset(self, request):
