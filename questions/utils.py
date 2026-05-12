@@ -1,7 +1,7 @@
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 
 
-def paginate(objects_list, request, per_page=10):
+def paginate(objects_list, request, per_page=20):
     paginator = Paginator(objects_list, per_page)
 
     page_num = request.GET.get('page', 1)
