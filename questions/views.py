@@ -1,5 +1,5 @@
 from django.contrib.auth.models import User
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 
 from .models import Question, Tag
 from .utils import paginate
@@ -52,7 +52,6 @@ def tag(request, tag: str):
     context = {
         'me': ME,
         'questions': page_obj,
-        'tag': tag,
         'title': f'Tag: {tag}',
     }
 
@@ -64,7 +63,6 @@ def hot(request):
     context = {
         'me': ME,
         'questions': page_obj,
-        'hot': True,
         'title': 'Hot Questions',
     }
 

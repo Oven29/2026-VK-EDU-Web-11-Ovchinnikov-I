@@ -79,6 +79,13 @@
 
         </div>
     </div>
+    {% empty %}
+    <div class="empty-state text-center py-2 px-3 bg-light rounded-3">
+        <h4 class="fw-bold">Пока нет ни одного ответа</h4>
+        <p class="text-muted mx-auto" style="max-width: 400px;">
+            Станьте первым, кто ответит на вопрос!
+        </p>
+    </div>
     {% endfor %}
 
     {% include 'questions/components/nav.html' with page=answers %}
