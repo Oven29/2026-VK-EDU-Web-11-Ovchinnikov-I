@@ -1,113 +1,59 @@
 {% extends 'questions/base.html' %}
 
+{% if tag or hot %}
+{% block title %}{{ block.super }} {{ title }}{% endblock %}
+{% endif %}
+
 {% block content %}
 <div class="d-flex align-items-baseline mb-4">
-    <h2 class="me-3">New Questions</h2>
-    <a href="{% url 'hot' %}" class="text-decoration-none">Hot Questions</a>
+    <h2 class="me-3">{{ title }}</h2>
+    {% if not tag and not hot %}
+    <a href="{% url 'hot' %}" class="text-decoration-none"><u>Hot Questions</u></a>
+    {% endif %}
 </div>
 
 <!-- вопросы -->
+{% for q in questions %}
 <div class="question-card">
-    <div class="row">
-        <div class="col-2 text-center">
-            <div class="avatar-box mx-auto mb-2 d-flex align-items-center justify-content-center">
-                <span>avatar</span>
-            </div>
-
-            <div class="vote-widget mx-auto">
-                <div class="fw-bold me-1 vote-count">5</div>
-                <span class="vote-btn me-1" data-action="up">▲</span>
-                <span class="vote-btn" data-action="down">▼</span>
-            </div>
-
+    <div class="row g-3">
+        <div class="col-auto text-center">
+            {% include 'questions/components/rating.html' with rating=q.rating %}
         </div>
-        <div class="col-10">
-            <h3><a href="{% url 'question' 1 %}" class="text-decoration-none">How to build a web app?</a></h3>
-            <p class="text-muted">Lorem ipsum dolor sit amet consectetur adipisicing elit. Excepturi perferendis
-                deleniti recusandae at, fugit reprehenderit laudantium est corporis nobis odit!</p>
-            <div class="d-flex align-items-center mt-3">
-                <a href="{% url 'question' 1 %}" class="me-3 text-decoration-underline">answer (3)</a>
-                <span class="me-2">Tags:</span>
-                <a href="{% url 'tag' '213' %}" class="me-2 text-decoration-none">black-jack</a>
-                <a href="{% url 'tag' '213' %}" class="text-decoration-none">bender</a>
+
+        <div class="col">
+            <h3><a href="{% url 'question' q.id %}" class="text-decoration-none question-title">
+                    {{ q.title }}
+                </a></h3>
+            <p class="text-muted question-content">{{ q.content }}</p>
+            <div class="d-flex align-items-center mt-3 flex-wrap gap-1">
+                <a href="{% url 'question' q.id %}" class="me-3 text-decoration-underline">answers (3)</a>
+                <span class="text-muted me-2">Tags:</span>
+                {% for tag in q.tags %}
+                <a href="{% url 'tag' tag %}" class="me-2 tag">{{ tag }}</a>
+                {% endfor %}
             </div>
 
-            <div class="text-end text-muted">
-                <small>21 april 2026 18:31</small>
+            <div class="d-flex justify-content-between align-items-center mt-3">
+                <div>
+                    <small>
+                        <a href="{{ q.author.profile_path }}" class="fw-medium">
+                            <img src="{{ q.author.profile_photo }}" alt="{{ q.author.name }}"
+                                class="avatar-box-sm me-1 mb-2">
+                            {{ q.author.name }}
+                        </a>
+                    </small>
+                </div>
+
+                <div class="text-muted">
+                    <small>{{ q.created_at }}</small>
+                </div>
             </div>
+
         </div>
     </div>
 </div>
-<div class="question-card">
-    <div class="row">
-        <div class="col-2 text-center">
-            <div class="avatar-box mx-auto mb-2 d-flex align-items-center justify-content-center">
-                <span>avatar</span>
-            </div>
+{% endfor %}
 
-            <div class="vote-widget mx-auto">
-                <div class="fw-bold me-1 vote-count">5</div>
-                <span class="vote-btn me-1" data-action="up">▲</span>
-                <span class="vote-btn" data-action="down">▼</span>
-            </div>
-        </div>
-        <div class="col-10">
-            <h3><a href="{% url 'question' 2 %}" class="text-decoration-none">How to build a web app?</a></h3>
-            <p class="text-muted">Lorem ipsum dolor sit amet consectetur adipisicing elit. Excepturi perferendis
-                deleniti recusandae at, fugit reprehenderit laudantium est corporis nobis odit!</p>
-            <div class="d-flex align-items-center mt-3">
-                <a href="{% url 'question' 2 %}" class="me-3 text-decoration-underline">answer (2)</a>
-                <span class="me-2">Tags:</span>
-                <a href="{% url 'tag' '213' %}" class="me-2 text-decoration-none">black-jack</a>
-                <a href="{% url 'tag' '213' %}" class="text-decoration-none">bender</a>
-            </div>
+{% include 'questions/components/nav.html' with page=questions %}
 
-            <div class="text-end text-muted">
-                <small>9 april 2026 0:52</small>
-            </div>
-        </div>
-    </div>
-</div>
-<div class="question-card">
-    <div class="row">
-        <div class="col-2 text-center">
-            <div class="avatar-box mx-auto mb-2 d-flex align-items-center justify-content-center">
-                <span>avatar</span>
-            </div>
-            <div class="vote-widget mx-auto">
-                <div class="fw-bold me-1 vote-count">5</div>
-                <span class="vote-btn me-1" data-action="up">▲</span>
-                <span class="vote-btn" data-action="down">▼</span>
-            </div>
-
-        </div>
-        <div class="col-10">
-            <h3><a href="{% url 'question' 3 %}" class="text-decoration-none">Python vs C++ ?</a></h3>
-            <p class="text-muted">Lorem ipsum dolor sit amet consectetur adipisicing elit. Excepturi perferendis
-                deleniti recusandae at, fugit reprehenderit laudantium est corporis nobis odit!</p>
-            <div class="d-flex align-items-center mt-3">
-                <a href="{% url 'question' 3 %}" class="me-3 text-decoration-underline">answer (5)</a>
-                <span class="me-2">Tags:</span>
-                <a href="{% url 'tag' '213' %}" class="me-2 text-decoration-none">Python</a>
-                <a href="{% url 'tag' '213' %}" class="text-decoration-none">C++</a>
-
-            </div>
-
-            <div class="text-end text-muted">
-                <small>18 march 2026 18:01</small>
-            </div>
-        </div>
-    </div>
-</div>
-
-
-<nav aria-label="Page navigation" class="mt-4">
-    <ul class="pagination">
-        <li class="page-item active"><a class="page-link" href="#">1</a></li>
-        <li class="page-item"><a class="page-link" href="#">2</a></li>
-        <li class="page-item"><a class="page-link" href="#">3</a></li>
-        <li class="page-item disabled"><span class="page-link">...</span></li>
-        <li class="page-item"><a class="page-link" href="#">53</a></li>
-    </ul>
-</nav>
 {% endblock %}

@@ -28,10 +28,9 @@
             <div class="d-flex align-items-center">
                 <a href="{% url 'ask' %}" class="btn btn-primary me-3 fw-bold">ASK!</a>
                 <div class="d-flex align-items-center">
-                    <div class="avatar-box me-2 d-flex align-items-center justify-content-center"
-                        style="width: 40px; height: 40px;">
-                        <small>Img</small>
-                    </div>
+                    <a class="me-2" href="{{ me.profile_path }}">
+                        <img src="{{ me.profile_photo }}" alt="{{ me.name }}" class="avatar-box">
+                    </a>
                     <div>
                         <div class="fw-bold" style="font-size: 0.85rem;">Ivan Ovchinnikov</div>
                         <div style="font-size: 0.75rem;">
@@ -54,24 +53,18 @@
                 <div class="mb-5">
                     <h3 class="sidebar-title">Popular Tags</h3>
                     <div class="tag-cloud fw-bold">
-                        <a href="{% url 'tag' '213' %}" class="text-decoration-none text-secondary">perl</a>
-                        <a href="{% url 'tag' '213' %}" class="text-decoration-none text-danger">python</a>
-                        <a href="{% url 'tag' '213' %}" class="text-decoration-none text-dark">TechnoPark</a>
-                        <a href="{% url 'tag' '213' %}" class="text-decoration-none text-primary">MySQL</a>
-                        <a href="{% url 'tag' '213' %}" class="text-decoration-none text-success">django</a>
-                        <a href="{% url 'tag' '213' %}" class="text-decoration-none text-info">Mail.Ru</a>
-                        <a href="{% url 'tag' '213' %}" class="text-decoration-none text-warning">Firefox</a>
+                        {% for tag in tags %}
+                        <a href="{% url 'tag' tag %}" class="text-decoration-none tag">{{ tag }}</a>
+                        {% endfor %}
                     </div>
                 </div>
 
                 <div>
                     <h3 class="sidebar-title">Best Members</h3>
                     <ul class="list-unstyled">
-                        <li><a href="#" class="text-decoration-none">Ivan O.</a></li>
-                        <li><a href="#" class="text-decoration-none">Andrew D.</a></li>
-                        <li><a href="#" class="text-decoration-none">Anton D.</a></li>
-                        <li><a href="#" class="text-decoration-none">Semen L.</a></li>
-                        <li><a href="#" class="text-decoration-none">Genadyw</a></li>
+                        {% for member in best_members %}
+                        <li><a href="{{ member.profile_path }}" class="text-decoration-none">{{ member.name }}</a></li>
+                        {% endfor %}
                     </ul>
                 </div>
             </aside>

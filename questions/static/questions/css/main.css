@@ -12,6 +12,17 @@ main {
     flex: 1;
 }
 
+a {
+    text-decoration: none;
+    color: inherit;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+a:hover {
+    color: var(--bs-primary);
+}
+
 .sidebar-title {
     border-bottom: 2px solid #333;
     margin-bottom: 1rem;
@@ -22,40 +33,143 @@ main {
     margin-right: 5px;
 }
 
-.question-card {
+.tag {
+    white-space: nowrap;
+    display: inline-block;
+
+    padding: 0.25rem 0.85rem;
+    margin: 0.2rem;
+
+    background-color: var(--bs-light);
+    color: var(--bs-emphasis-color);
+    border: 1px solid var(--bs-border-color);
+
+    border-radius: 50rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease-in-out;
+}
+
+.tag:hover {
+    background-color: var(--bs-primary-bg-subtle);
+    border-color: var(--bs-primary);
+    color: var(--primary-color) !important;
+    transform: translateY(-1px);
+}
+
+.question-card,
+.answer-card {
     border: 1px solid var(--secondary-color);
     padding: 15px;
     margin-bottom: 20px;
     border-radius: 5px;
+    transition: shadow 0.2s ease;
+    word-break: break-word;
+}
+
+.question-card:hover,
+.answer-card:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.question-title,
+.question-content {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    word-break: break-word;
+}
+
+.question-title {
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+}
+
+.question-content {
+    -webkit-line-clamp: 4;
+    line-clamp: 4;
 }
 
 .vote-widget {
-    width: 60px;
-    text-align: center;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    padding: 5px;
     display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    width: 40px;
+}
+
+.vote-count {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--bs-emphasis-color);
 }
 
 .vote-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 25px;
+    height: 25px;
+
+    border-radius: 30%;
+    border: 1px solid var(--bs-border-color);
+    background-color: var(--bs-light);
+    color: var(--bs-secondary-color);
+
     cursor: pointer;
     user-select: none;
-    transition: color 0.2s;
+    font-weight: bold;
+    font-size: 1.2rem;
+    line-height: 1;
+    transition: all 0.2s ease;
+    padding-bottom: 4px;
 }
 
-.vote-btn.active {
-    font-weight: bold;
-    opacity: 1;
+.vote-up:hover,
+.vote-down:hover {
+    transform: translateY(-2px);
+}
+
+.vote-up:hover {
+    border-color: var(--bs-success);
+    color: var(--bs-success) !important;
+}
+
+.vote-down:hover {
+    border-color: var(--bs-danger);
+    color: var(--bs-danger) !important;
+}
+
+.vote-up.active {
+    background-color: var(--bs-success-bg-subtle);
+    border-color: var(--bs-success);
+    color: var(--bs-success) !important;
+}
+
+.vote-down.active {
+    background-color: var(--bs-danger-bg-subtle);
+    border-color: var(--bs-danger);
+    color: var(--bs-danger) !important;
+}
+
+.avatar-box,
+.avatar-box-sm {
+    object-fit: cover;
+    object-position: center;
+    border: 1px solid #ddd;
+    border-radius: 30%;
 }
 
 .avatar-box {
-    width: 80px;
-    height: 80px;
-    background: #eee;
-    border: 1px solid #ddd;
+    width: 45px;
+    height: 45px;
+}
+
+.avatar-box-sm {
+    width: 24px;
+    height: 24px;
 }
 
 footer {
@@ -63,13 +177,6 @@ footer {
     border-top: 1px solid var(--secondary-color);
     padding: 20px 0;
     margin-top: 40px;
-}
-
-.answer-card {
-    border: 1px solid var(--secondary-color);
-    padding: 15px;
-    margin-bottom: 20px;
-    border-radius: 5px;
 }
 
 .correct-answer {

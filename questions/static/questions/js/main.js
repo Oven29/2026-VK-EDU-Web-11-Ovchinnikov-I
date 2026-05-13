@@ -14,22 +14,22 @@ $(document).ready(function () {
         let currentVotes = parseInt($counter.text());
 
         if ($this.hasClass('active')) {
-            $this.removeClass('active text-success text-danger');
+            $this.removeClass('active');
             $counter.text(action === 'up' ? currentVotes - 1 : currentVotes + 1);
             return;
         }
 
         if ($opposed.hasClass('active')) {
-            $opposed.removeClass('active text-success text-danger');
+            $opposed.removeClass('active');
             currentVotes = action === 'up' ? currentVotes + 1 : currentVotes - 1;
         }
 
         $this.addClass('active');
         if (action === 'up') {
-            $this.addClass('text-success');
+            $this.addClass('');
             $counter.text(currentVotes + 1);
         } else {
-            $this.addClass('text-danger');
+            $this.addClass('');
             $counter.text(currentVotes - 1);
         }
     });
@@ -41,10 +41,8 @@ $(document).ready(function () {
 
         if (countSymbols >= 3000) {
             $(this).val(text.slice(0, 3000));
-            $counter.addClass('text-danger');
-        } else {
-            $counter.removeClass('text-danger');
         }
+    
         $counter.text(`${countSymbols}/3000`);
     }).trigger('input');
 

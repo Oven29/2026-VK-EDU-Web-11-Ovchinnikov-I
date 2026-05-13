@@ -1,38 +1,40 @@
 {% extends 'questions/base.html' %}
 
-{% block title %}How to build a moon park?{% endblock %}
+{% block title %}{{ block.super }}: {{ question.title|truncatechars:50 }}{% endblock %}
 
 {% block content %}
 <div class="question-card mb-5">
-    <div class="row">
-        <div class="col-2 text-center">
-            <div class="avatar-box mx-auto mb-2 d-flex align-items-center justify-content-center"><span>avatar</span>
-            </div>
-
-            <div class="vote-widget mx-auto">
-                <div class="fw-bold me-1 vote-count">5</div>
-                <span class="vote-btn me-1" data-action="up">▲</span>
-                <span class="vote-btn" data-action="down">▼</span>
-            </div>
-
+    <div class="row g-3">
+        <div class="col-auto text-center">
+            {% include 'questions/components/rating.html' with rating=question.rating %}
         </div>
-        <div class="col-10">
-            <h3>How to build a moon park?</h3>
-            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed diam nonummy nibh euismod tincidunt ut
-                laoreet dolore magna aliquam erat volutpat...
-                Lorem ipsum dolor sit amet consectetur, adipisicing elit. Ipsum a voluptas nihil eos in impedit tenetur
-                ea rem eaque dolores autem dolorem tempora quos voluptates accusantium, numquam dicta aliquam beatae
-                reiciendis, iure cum ratione facere aspernatur distinctio? Labore laudantium voluptatibus quas quia,
-                fugiat, aperiam possimus, suscipit rem facilis eaque tempora?</p>
+        <div class="col">
+            <h3>{{ question.title }}</h3>
+            <p>{{ question.content }}</p>
             <div class="mt-3">
-                <span class="me-2">Tags:</span>
-                <a href="#" class="text-decoration-none me-2">black-jack</a>
-                <a href="#" class="text-decoration-none">bender</a>
+                <span class="text-muted me-2">Tags:</span>
+                {% for tag in question.tags %}
+                <a href="{% url 'tag' tag %}" class="me-2 tag">{{ tag }}</a>
+                {% endfor %}
             </div>
 
-            <div class="text-end text-muted">
-                <small>9 april 2026 0:52</small>
+
+            <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap gap-1">
+                <div>
+                    <small>
+                        <a href="{{ question.author.profile_path }}" class="fw-medium">
+                            <img src="{{ question.author.profile_photo }}" alt="{{ question.author.name }}"
+                                class="avatar-box-sm me-1 mb-2">
+                            {{ question.author.name }}
+                        </a>
+                    </small>
+                </div>
+
+                <div class="text-muted">
+                    <small>{{ question.created_at }}</small>
+                </div>
             </div>
+
         </div>
     </div>
 </div>
@@ -40,62 +42,47 @@
 <hr>
 
 <div class="answers-list">
-    <div class="answer-card correct-answer">
-        <div class="row">
-            <div class="col-2 text-center">
-                <div class="avatar-box mx-auto mb-2 d-flex align-items-center justify-content-center">
-                    <span>avatar</span>
-                </div>
+    {% for answer in answers %}
+    <div class="answer-card {% if answer.is_correct %}correct-answer{% endif %}">
+        <div class="row g-3">
+            <div class="col-auto text-center">
+                {% include 'questions/components/rating.html' with rating=answer.rating %}
+            </div>
 
-                <div class="vote-widget mx-auto">
-                    <div class="fw-bold me-1 vote-count">5</div>
-                    <span class="vote-btn me-1" data-action="up">▲</span>
-                    <span class="vote-btn" data-action="down">▼</span>
-                </div>
+            <div class="col">
+                <p>{{ answer.content }}</p>
 
                 <div class="form-check d-inline-block">
-                    <input class="form-check-input" type="checkbox" checked id="correct1">
-                    <label class="form-check-label correct-label" for="correct1">Correct!</label>
+                    <input class="form-check-input" type="checkbox" value="{{ answer.id }}" id="correct{{ answer.id }}"
+                        {% if answer.is_correct %}checked{% endif %}>
+                    <label class="form-check-label  {% if answer.is_correct %}correct-label{% endif %}"
+                        for="correct1">Correct!</label>
                 </div>
-            </div>
-            <div class="col-10">
-                <p>First of all I would like to thank you for the invitation to participate in such a... Russia is the
-                    huge territory which in many respects needs to be render habitable.</p>
+
+                <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap gap-1">
+                    <div>
+                        <small>
+                            <a href="{{ answer.author.profile_path }}" class="fw-medium">
+                                <img src="{{ answer.author.profile_photo }}" alt="{{ answer.author.name }}"
+                                    class="avatar-box-sm me-1 mb-2">
+                                {{ answer.author.name }}
+                            </a>
+                        </small>
+                    </div>
+
+                    <div class="text-muted">
+                        <small>{{ answer.created_at }}</small>
+                    </div>
+                </div>
+
             </div>
 
-            <div class="text-end text-muted">
-                <small>9 april 2026 0:52</small>
-            </div>
         </div>
     </div>
+    {% endfor %}
 
-    <div class="answer-card">
-        <div class="row">
-            <div class="col-2 text-center">
-                <div class="avatar-box mx-auto mb-2 d-flex align-items-center justify-content-center">
-                    <span>avatar</span>
-                </div>
+    {% include 'questions/components/nav.html' with page=answers %}
 
-                <div class="vote-widget mx-auto">
-                    <div class="fw-bold me-1 vote-count">5</div>
-                    <span class="vote-btn me-1" data-action="up">▲</span>
-                    <span class="vote-btn" data-action="down">▼</span>
-                </div>
-
-                <div class="form-check d-inline-block">
-                    <input class="form-check-input" type="checkbox" id="correct2">
-                    <label class="form-check-label" for="correct2">Correct!</label>
-                </div>
-            </div>
-            <div class="col-10">
-                <p>Another helpful answer with some advice...</p>
-            </div>
-
-            <div class="text-end text-muted">
-                <small>9 april 2026 0:52</small>
-            </div>
-        </div>
-    </div>
 </div>
 
 <div class="mt-5">
