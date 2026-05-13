@@ -63,7 +63,10 @@
                     <h3 class="sidebar-title">Best Members</h3>
                     <ul class="list-unstyled">
                         {% for member in best_members %}
-                        <li><a href="#" class="text-decoration-none">{{ member.name }}</a></li>
+                        <li>
+                            <a href="{% url 'user_questions' member.user.username %}"
+                                class="text-decoration-none">{{ member.name }}</a>
+                        </li>
                         {% endfor %}
                     </ul>
                 </div>

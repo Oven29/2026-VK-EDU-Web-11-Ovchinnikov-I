@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from django.shortcuts import render, get_object_or_404
 
 from .models import Question, Tag
@@ -65,6 +66,18 @@ def hot(request):
         'questions': page_obj,
         'hot': True,
         'title': 'Hot Questions',
+    }
+
+    return render(request, 'questions/index.html', context)
+
+
+def user_questions(request, username: str):
+    user = get_object_or_404(User, username=username)
+    page_obj = paginate(Question.objects.by_author(user.username), request)
+    context = {
+        'me': ME,
+        'questions': page_obj,
+        'title': f'{username}\'s questions',
     }
 
     return render(request, 'questions/index.html', context)

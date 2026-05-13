@@ -22,7 +22,7 @@
             <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap gap-1">
                 <div>
                     <small>
-                        <a href="#" class="fw-medium">
+                        <a href="{% url 'user_questions' question.author.username %}" class="fw-medium">
                             <img src="{{ question.author.profile.photo.url }}" alt="{{ question.author.profile.name }}"
                                 class="avatar-box-sm me-1 mb-2">
                             {{ question.author.profile.name }}
@@ -62,7 +62,7 @@
                 <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap gap-1">
                     <div>
                         <small>
-                            <a href="#" class="fw-medium">
+                            <a href="{% url 'user_questions' answer.author.username %}" class="fw-medium">
                                 <img src="{{ answer.author.profile.photo.url }}" alt="{{ answer.author.profile.name }}"
                                     class="avatar-box-sm me-1 mb-2">
                                 {{ answer.author.profile.name }}

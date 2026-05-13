@@ -20,6 +20,10 @@ class QuestionManager(models.Manager):
     def by_tag(self, tag_name):
         return self._with_related().filter(tags__name=tag_name).distinct().order_by('-rating')
 
+    def by_author(self, username):
+        """Возвращает вопросы конкретного пользователя"""
+        return self._with_related().filter(author__username=username).order_by('-created_at')
+
 
 class TagManager(models.Manager):
     def popular(self):
