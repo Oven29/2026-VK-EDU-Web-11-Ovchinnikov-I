@@ -5,12 +5,36 @@ services:
       context: .
     restart: unless-stopped
     command: >
-      python manage.py runserver 0.0.0.0:8000
+      sh -c "python manage.py migrate &&
+             python manage.py runserver 0.0.0.0:8000"
     volumes:
       - .:/app
       - django_media:/app/media
     ports:
       - "8000:8000"
+    networks:
+      - common
+    depends_on:
+      - db
+
+  db:
+    image: postgres
+    container_name: IvanAsk_postgres
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_PORT: ${DB_PORT}
+    restart: unless-stopped
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    networks:
+      - common
 
 volumes:
   django_media:
+  db-data:
+
+networks:
+  common:
+    driver: bridge
