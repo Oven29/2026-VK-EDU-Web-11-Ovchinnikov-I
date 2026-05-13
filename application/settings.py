@@ -19,7 +19,7 @@ import environ
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 env = environ.Env(
-    debug=(bool, False),
+    DEBUG=(bool, False),
 )
 
 env_name = os.getenv("ENV", ".env")
