@@ -1,46 +1,46 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 
 {% block title %}Profile settings{% endblock %}
 
 {% block content %}
-<h2 class="mb-4">Settings: Ivan Ovchinnikov</h2>
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <h2 class="mb-4">Settings: {{ user.username }}</h2>
 
-<span class="text-danger d-block mt-1 error-msg"></span>
-
-<form action="#" class="mt-4">
-    <div class="row mb-3 align-items-center">
-        <label class="col-sm-2 col-form-label fw-bold">Login</label>
-        <div class="col-sm-6">
-            <input type="text" class="form-control" value="ivan123">
+        {% if user.profile.photo %}
+        <div class="mb-4 text-center ">
+            <img src="{{ user.profile.photo.url }}" alt="{{ user.username }}" class="img-thumbnail rounded-4"
+                style="max-width: 200px;">
         </div>
-    </div>
+        {% endif %}
 
-    <div class="row mb-3 align-items-center">
-        <label class="col-sm-2 col-form-label fw-bold">Email</label>
-        <div class="col-sm-6">
-            <input type="email" class="form-control email-input" value="dr.pepper@mail.ru">
-        </div>
-    </div>
+        <form method="post" action="{% url 'profile' %}" enctype="multipart/form-data">
+            {% csrf_token %}
 
-    <div class="row mb-3 align-items-center">
-        <label class="col-sm-2 col-form-label fw-bold">NickName</label>
-        <div class="col-sm-6">
-            <input type="text" class="form-control" value="Dr. Pepper">
-        </div>
-    </div>
+            {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+                {% for error in form.non_field_errors %}
+                {{ error }}
+                {% endfor %}
+            </div>
+            {% endif %}
 
-    <div class="row mb-3">
-        <label class="col-sm-2 col-form-label fw-bold">Upload avatar</label>
-        <div class="col-sm-6">
-            <div class="avatar-box mb-2 d-flex align-items-center justify-content-center"><span>avatar</span></div>
-            <input class="form-control" type="file">
-        </div>
-    </div>
+            {% for field in form %}
+            <div class="mb-3">
+                <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}
+                <div class="text-danger small">
+                    {% for error in field.errors %}
+                    {{ error }}
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
 
-    <div class="row mt-4">
-        <div class="col-sm-6 offset-sm-2">
-            <button type="submit" class="btn btn-dark px-4">Save</button>
-        </div>
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+        </form>
     </div>
-</form>
+</div>
 {% endblock %}
