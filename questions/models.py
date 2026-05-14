@@ -3,7 +3,7 @@ import re
 from django.db import models
 from django.contrib.auth.models import User
 
-from .managers import QuestionManager, TagManager
+from .managers import QuestionManager, TagManager, LikeManager, AnswerManager
 
 
 class Tag(models.Model):
@@ -13,7 +13,6 @@ class Tag(models.Model):
     objects = TagManager()
 
     def __str__(self):
-        # Отсекаю номер чтобы при тестовых данных это уродливо не выглядело
         return re.sub(r'_\d+$', '', self.name)
 
     class Meta:
@@ -54,6 +53,8 @@ class Answer(models.Model):
     created_at = models.DateTimeField(
         auto_now_add=True, verbose_name='Дата создания')
 
+    objects = AnswerManager()
+
     def __str__(self):
         return f'Ответ на "{self.question.title}" от {self.author.username}'
 
@@ -82,6 +83,8 @@ class LikeAbstract(models.Model):
     )
     created_at = models.DateTimeField(
         auto_now_add=True, verbose_name='Дата создания')
+
+    objects = LikeManager()
 
     class Meta:
         abstract = True

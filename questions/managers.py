@@ -1,4 +1,5 @@
-from django.db import models
+from django.db import models, transaction
+from django.db.models import F
 
 
 class QuestionManager(models.Manager):
@@ -44,3 +45,47 @@ class TagManager(models.Manager):
         return self.annotate(
             question_count=models.Count('questions')
         ).order_by('-question_count')[:10]
+
+
+class LikeManager(models.Manager):
+    @transaction.atomic
+    def toggle_vote(self, user, obj, value):
+        lookup_field = 'question' if hasattr(self.model, 'question') else 'answer'
+        lookup = {lookup_field: obj, 'user': user}
+        
+        like, created = self.get_or_create(**lookup, defaults={'value': value})
+        
+        if not created:
+            if like.value == value:
+                like.delete()
+                obj.rating = F('rating') - value
+            else:
+                like.value = value
+                like.save()
+                obj.rating = F('rating') + 2 * value
+        else:
+            obj.rating = F('rating') + value
+            
+        obj.save()
+        obj.refresh_from_db()
+
+        return obj.rating
+
+
+class AnswerManager(models.Manager):
+    def toggle_correct(self, user, answer_id):
+        answer = self.get_queryset().select_related('question').get(pk=answer_id)
+        
+        if user != answer.question.author:
+            return False, 'Not authorized'
+        
+        with transaction.atomic():
+            if answer.is_correct:
+                answer.is_correct = False
+                answer.save()
+            else:
+                answer.question.answers.all().update(is_correct=False)
+                answer.is_correct = True
+                answer.save()
+
+        return True, answer.is_correct
