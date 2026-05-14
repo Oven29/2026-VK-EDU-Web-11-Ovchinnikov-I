@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ block.super }}: {{ question.title|truncatechars:50 }}{% endblock %}
+{% block title %}{{ question.title|truncatechars:50 }}{% endblock %}
 
 {% block content %}
 <div class="question-card mb-5">
@@ -12,7 +12,7 @@
             <h3>{{ question.title }}</h3>
             <p>{{ question.content }}</p>
             <div class="mt-3">
-                <span class="text-muted me-2">Tags:</span>
+                <span class="text-muted me-2">Теги:</span>
                 {% for tag in question.tags.all %}
                 <a href="{% url 'tag' tag.name %}" class="me-2 tag">{{ tag }}</a>
                 {% endfor %}
@@ -23,9 +23,10 @@
                 <div>
                     <small>
                         <a href="{% url 'user_questions' question.author.username %}" class="fw-medium">
-                            <img src="{{ question.author.profile.photo.url }}" alt="{{ question.author.profile.name }}"
-                                class="avatar-box-sm me-1 mb-2">
-                            {{ question.author.profile.name }}
+                            {% if question.author.profile.photo %}
+                            <img src="{{ question.author.profile.photo.url }}" alt="{{ question.author.username }}" class="avatar-box-sm me-1 mb-2">
+                            {% endif %}
+                            {{ question.author.username }}
                         </a>
                     </small>
                 </div>
@@ -43,7 +44,7 @@
 
 <div class="answers-list">
     {% for answer in answers %}
-    <div class="answer-card {% if answer.is_correct %}correct-answer{% endif %}">
+    <div class="answer-card {% if answer.is_correct %}correct-answer{% endif %}" id="answer-{{ answer.id }}">
         <div class="row g-3">
             <div class="col-auto text-center">
                 {% include 'questions/components/rating.html' with rating=answer.rating %}
@@ -56,16 +57,17 @@
                     <input class="form-check-input" type="checkbox" value="{{ answer.id }}" id="correct{{ answer.id }}"
                         {% if answer.is_correct %}checked{% endif %}>
                     <label class="form-check-label  {% if answer.is_correct %}correct-label{% endif %}"
-                        for="correct1">Correct!</label>
+                        for="correct{{ answer.id }}">Верно!</label>
                 </div>
 
                 <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap gap-1">
                     <div>
                         <small>
                             <a href="{% url 'user_questions' answer.author.username %}" class="fw-medium">
-                                <img src="{{ answer.author.profile.photo.url }}" alt="{{ answer.author.profile.name }}"
-                                    class="avatar-box-sm me-1 mb-2">
-                                {{ answer.author.profile.name }}
+                                {% if answer.author.profile.photo %}
+                                <img src="{{ answer.author.profile.photo.url }}" alt="{{ answer.author.username }}" class="avatar-box-sm me-1 mb-2">
+                                {% endif %}
+                                {{ answer.author.username }}
                             </a>
                         </small>
                     </div>
@@ -93,10 +95,32 @@
 </div>
 
 <div class="mt-5">
-    <textarea id="editor" class="form-control mb-3" rows="5" placeholder="Enter your answer here.."></textarea>
-    <div class="form-text mb-3 text-end">
-        <span id="count-symbols">0/3000</span>
-    </div>
-    <button class="btn btn-dark px-4">Answer</button>
+    <h4 class="mb-3">Ваш ответ</h4>
+    <form method="post" action="{% url 'question' question.id %}">
+        {% csrf_token %}
+        
+        {% if form.non_field_errors %}
+        <div class="alert alert-danger">
+            {% for error in form.non_field_errors %}
+            {{ error }}
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% for field in form %}
+        <div class="mb-3">
+            {{ field }}
+            {% if field.errors %}
+            <div class="text-danger small">
+                {% for error in field.errors %}
+                {{ error }}
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+        
+        <button type="submit" class="btn btn-dark px-4">Ответить</button>
+    </form>
 </div>
 {% endblock %}

@@ -1,21 +1,16 @@
 from django.contrib.auth.models import User
 from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required
+from django.urls import reverse
 
-from .models import Question, Tag
+from .models import Question, Tag, Answer
 from .utils import paginate
-
-
-ME = {
-    "name": "Ivan. O",
-    "profile_path": "#",
-    "profile_photo": "https://i.yapx.ru/dkv1w.jpg",
-}
+from .forms import QuestionForm, AnswerForm
 
 
 def index(request):
     page_obj = paginate(Question.objects.new(), request)
     context = {
-        'me': ME,
         'questions': page_obj,
     }
 
@@ -23,36 +18,52 @@ def index(request):
 
 
 def question(request, pk: int):
-    question = get_object_or_404(
+    question_obj = get_object_or_404(
         Question.objects.select_related('author').prefetch_related('tags'),
         pk=pk,
     )
-    answers = question.answers.all().select_related('author')
+    
+    if request.method == 'POST':
+        if not request.user.is_authenticated:
+            return redirect('login')
+        form = AnswerForm(request.POST)
+        if form.is_valid():
+            answer = form.save(author=request.user, question=question_obj)
+            # Redirect to the last page of answers or just back to the question
+            return redirect(reverse('question', kwargs={'pk': pk}) + f'#answer-{answer.id}')
+    else:
+        form = AnswerForm()
+
+    answers = question_obj.answers.all().select_related('author')
     page_obj = paginate(answers, request)
     context = {
-        'me': ME,
-        'question': question,
+        'question': question_obj,
         'answers': page_obj,
+        'form': form,
     }
 
     return render(request, 'questions/question.html', context)
 
 
+@login_required
 def ask(request):
-    context = {
-        'me': ME,
-    }
-
-    return render(request, 'questions/ask.html', context)
+    if request.method == 'POST':
+        form = QuestionForm(request.POST)
+        if form.is_valid():
+            question_obj = form.save(author=request.user)
+            return redirect('question', pk=question_obj.pk)
+    else:
+        form = QuestionForm()
+    
+    return render(request, 'questions/ask.html', {'form': form})
 
 
 def tag(request, tag: str):
-    tag = get_object_or_404(Tag, name=tag)
-    page_obj = paginate(Question.objects.by_tag(tag.name), request)
+    tag_obj = get_object_or_404(Tag, name=tag)
+    page_obj = paginate(Question.objects.by_tag(tag_obj.name), request)
     context = {
-        'me': ME,
         'questions': page_obj,
-        'title': f'Tag: {tag}',
+        'title': f'Tag: {tag_obj}',
     }
 
     return render(request, 'questions/index.html', context)
@@ -61,7 +72,6 @@ def tag(request, tag: str):
 def hot(request):
     page_obj = paginate(Question.objects.hot(), request)
     context = {
-        'me': ME,
         'questions': page_obj,
         'title': 'Hot Questions',
     }
@@ -73,7 +83,6 @@ def user_questions(request, username: str):
     user = get_object_or_404(User, username=username)
     page_obj = paginate(Question.objects.by_author(user.username), request)
     context = {
-        'me': ME,
         'questions': page_obj,
         'title': f'{username}\'s questions',
     }
