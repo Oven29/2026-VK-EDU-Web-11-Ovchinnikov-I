@@ -3,41 +3,58 @@ from django.contrib.auth.models import User
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
-
 from .models import Profile
 
 
 class LoginForm(AuthenticationForm):
     username = forms.CharField(
-        widget=forms.TextInput(attrs={'class': 'form-control'}))
+        label='Логин',
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Введите ваш логин'})
+    )
     password = forms.CharField(
-        widget=forms.PasswordInput(attrs={'class': 'form-control'}))
+        label='Пароль',
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Введите пароль'})
+    )
 
 
 class SignupForm(forms.ModelForm):
-    password = forms.CharField(widget=forms.PasswordInput(
-        attrs={'class': 'form-control'}), label='Пароль')
-    password_confirm = forms.CharField(widget=forms.PasswordInput(
-        attrs={'class': 'form-control'}), label='Подтверждение пароля')
-    email = forms.EmailField(required=True, widget=forms.EmailInput(
-        attrs={'class': 'form-control'}))
-    photo = forms.ImageField(required=False, widget=forms.FileInput(
-        attrs={'class': 'form-control'}))
+    password = forms.CharField(
+        label='Пароль',
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Придумайте пароль'})
+    )
+    password_confirm = forms.CharField(
+        label='Подтверждение пароля',
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Повторите пароль'})
+    )
+    email = forms.EmailField(
+        label='Email',
+        required=True,
+        widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'example@mail.ru'})
+    )
+    photo = forms.ImageField(
+        label='Аватар',
+        required=False,
+        widget=forms.FileInput(attrs={'class': 'form-control'})
+    )
 
     class Meta:
         model = User
         fields = ('username', 'email', 'first_name', 'last_name')
+        labels = {
+            'username': 'Логин',
+            'first_name': 'Имя',
+            'last_name': 'Фамилия',
+        }
         widgets = {
-            'username': forms.TextInput(attrs={'class': 'form-control'}),
-            'first_name': forms.TextInput(attrs={'class': 'form-control'}),
-            'last_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'username': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'ivan123'}),
+            'first_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Иван'}),
+            'last_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Иванов'}),
         }
 
     def clean_email(self):
         email = self.cleaned_data.get('email')
         if User.objects.filter(email=email).exists():
-            raise ValidationError(
-                "Пользователь с такой почтой уже существует.")
+            raise ValidationError("Пользователь с такой почтой уже существует.")
         return email
 
     def clean(self):
@@ -57,24 +74,34 @@ class SignupForm(forms.ModelForm):
         user.set_password(self.cleaned_data["password"])
         if commit:
             user.save()
-            Profile.objects.create(
-                user=user, photo=self.cleaned_data.get('photo'))
+            Profile.objects.create(user=user, photo=self.cleaned_data.get('photo'))
         return user
 
 
 class SettingsForm(forms.ModelForm):
-    photo = forms.ImageField(required=False, widget=forms.FileInput(
-        attrs={'class': 'form-control'}))
-    email = forms.EmailField(required=True, widget=forms.EmailInput(
-        attrs={'class': 'form-control'}))
+    photo = forms.ImageField(
+        label='Аватар',
+        required=False,
+        widget=forms.FileInput(attrs={'class': 'form-control'})
+    )
+    email = forms.EmailField(
+        label='Email',
+        required=True,
+        widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'example@mail.ru'})
+    )
 
     class Meta:
         model = User
         fields = ('username', 'email', 'first_name', 'last_name')
+        labels = {
+            'username': 'Логин',
+            'first_name': 'Имя',
+            'last_name': 'Фамилия',
+        }
         widgets = {
-            'username': forms.TextInput(attrs={'class': 'form-control'}),
-            'first_name': forms.TextInput(attrs={'class': 'form-control'}),
-            'last_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'username': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'ivan123'}),
+            'first_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Иван'}),
+            'last_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Иванов'}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -85,8 +112,7 @@ class SettingsForm(forms.ModelForm):
     def clean_email(self):
         email = self.cleaned_data.get('email')
         if User.objects.filter(email=email).exclude(pk=self.instance.pk).exists():
-            raise ValidationError(
-                "Пользователь с такой почтой уже существует.")
+            raise ValidationError("Пользователь с такой почтой уже существует.")
         return email
 
     def save(self, commit=True):

@@ -37,15 +37,15 @@
                     <div>
                         <div class="fw-bold" style="font-size: 0.85rem;">{{ user.username }}</div>
                         <div style="font-size: 0.75rem;">
-                            <a href="{% url 'profile' %}" class="text-decoration-none">settings</a>
-                            <a href="{% url 'logout' %}" class="text-decoration-none ms-1 text-danger">log out</a>
+                            <a href="{% url 'profile' %}" class="text-decoration-none">настройки</a>
+                            <a href="{% url 'logout' %}" class="text-decoration-none ms-1 text-danger">выход</a>
                         </div>
                     </div>
                 </div>
                 {% else %}
                 <div class="d-flex align-items-center">
-                    <a href="{% url 'login' %}" class="btn btn-outline-secondary me-2">Log In</a>
-                    <a href="{% url 'signup' %}" class="btn btn-outline-primary">Sign Up</a>
+                    <a href="{% url 'login' %}" class="btn btn-outline-secondary me-2">Войти</a>
+                    <a href="{% url 'signup' %}" class="btn btn-outline-primary">Регистрация</a>
                 </div>
                 {% endif %}
             </div>
