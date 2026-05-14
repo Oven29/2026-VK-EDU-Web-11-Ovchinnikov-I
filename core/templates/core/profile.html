@@ -5,17 +5,20 @@
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-md-8">
-        <h2 class="mb-4">Настройки: {{ user.username }}</h2>
-        
+        <h2 class="mb-4">Настройки: {{ user.username }}
+            <a class="btn btn-outline-secondary" href="{% url 'user_questions' user.username %}">Мои вопросы</a>
+        </h2>
+
         {% if user.profile.photo %}
         <div class="mb-4 text-center ">
-            <img src="{{ user.profile.photo.url }}" alt="{{ user.username }}" class="img-thumbnail rounded-4" style="max-width: 200px;">
+            <img src="{{ user.profile.photo.url }}" alt="{{ user.username }}" class="img-thumbnail rounded-4"
+                style="max-width: 200px;">
         </div>
         {% endif %}
 
         <form method="post" action="{% url 'profile' %}" enctype="multipart/form-data">
             {% csrf_token %}
-            
+
             {% if form.non_field_errors %}
             <div class="alert alert-danger">
                 {% for error in form.non_field_errors %}
@@ -37,7 +40,7 @@
                 {% endif %}
             </div>
             {% endfor %}
-            
+
             <button type="submit" class="btn btn-primary">Сохранить изменения</button>
         </form>
     </div>
