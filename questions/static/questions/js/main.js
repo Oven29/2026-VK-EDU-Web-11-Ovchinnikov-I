@@ -1,3 +1,20 @@
+const getCookie = (name) => {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+const csrftoken = getCookie('csrftoken');
+
 const validEmail = (email) => {
     const emailRegex = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/;
     return emailRegex.test(email);
@@ -9,33 +26,82 @@ $(document).ready(function () {
         const action = $this.data('action');
         const $container = $this.closest('.vote-widget');
         const $counter = $container.find('.vote-count');
-        const $opposed = $this.siblings('.vote-btn');
+        
+        const objectId = $container.data('id');
+        const objectType = $container.data('type');
 
-        if ($this.hasClass('disabled')) {
+        if ($this.hasClass('pe-none')) {
             return;
         }
 
-        let currentVotes = parseInt($counter.text());
+        const url = objectType === 'question' ? '/vote/question/' : '/vote/answer/';
 
-        if ($this.hasClass('active')) {
-            $this.removeClass('active');
-            $counter.text(action === 'up' ? currentVotes - 1 : currentVotes + 1);
-            return;
-        }
+        $.ajax({
+            url: url,
+            method: 'POST',
+            data: {
+                'id': objectId,
+                'type': action
+            },
+            headers: {
+                'X-CSRFToken': csrftoken
+            },
+            success: function (data) {
+                $counter.text(data.rating);
+                
+                // Optional: toggle active classes for visual feedback
+                const $opposed = $this.siblings('.vote-btn');
+                if ($this.hasClass('active')) {
+                    $this.removeClass('active');
+                } else {
+                    $this.addClass('active');
+                    $opposed.removeClass('active');
+                }
+            },
+            error: function (xhr) {
+                console.error('Error voting:', xhr.responseJSON);
+                if (xhr.status === 403) {
+                    alert('Пожалуйста, войдите в систему, чтобы голосовать.');
+                }
+            }
+        });
+    });
 
-        if ($opposed.hasClass('active')) {
-            $opposed.removeClass('active');
-            currentVotes = action === 'up' ? currentVotes + 1 : currentVotes - 1;
-        }
+    $('.correct-checkbox').on('change', function () {
+        const $this = $(this);
+        const answerId = $this.val();
+        const $card = $this.closest('.answer-card');
+        const $label = $card.find('.form-check-label');
 
-        $this.addClass('active');
-        if (action === 'up') {
-            $this.addClass('');
-            $counter.text(currentVotes + 1);
-        } else {
-            $this.addClass('');
-            $counter.text(currentVotes - 1);
-        }
+        $.ajax({
+            url: '/answer/correct/',
+            method: 'POST',
+            data: {
+                'id': answerId
+            },
+            headers: {
+                'X-CSRFToken': csrftoken
+            },
+            success: function (data) {
+                if (data.is_correct) {
+                    // Remove correct status from other cards
+                    $('.answer-card').removeClass('correct-answer');
+                    $('.form-check-label').removeClass('correct-label');
+                    $('.correct-checkbox').not($this).prop('checked', false);
+                    
+                    $card.addClass('correct-answer');
+                    $label.addClass('correct-label');
+                } else {
+                    $card.removeClass('correct-answer');
+                    $label.removeClass('correct-label');
+                }
+            },
+            error: function (xhr) {
+                console.error('Error marking correct:', xhr.responseJSON);
+                // Revert checkbox state on error
+                $this.prop('checked', !$this.prop('checked'));
+            }
+        });
     });
 
     $('#editor').on('input', function () {

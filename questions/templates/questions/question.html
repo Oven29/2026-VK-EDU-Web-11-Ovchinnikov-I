@@ -6,7 +6,7 @@
 <div class="question-card mb-5">
     <div class="row g-3">
         <div class="col-auto text-center">
-            {% include 'questions/components/rating.html' with rating=question.rating %}
+            {% include 'questions/components/rating.html' with rating=question.rating id=question.id type='question' %}
         </div>
         <div class="col">
             <h3>{{ question.title }}</h3>
@@ -47,14 +47,14 @@
     <div class="answer-card {% if answer.is_correct %}correct-answer{% endif %}" id="answer-{{ answer.id }}">
         <div class="row g-3">
             <div class="col-auto text-center">
-                {% include 'questions/components/rating.html' with rating=answer.rating %}
+                {% include 'questions/components/rating.html' with rating=answer.rating id=answer.id type='answer' %}
             </div>
 
             <div class="col">
                 <p>{{ answer.content }}</p>
 
                 <div class="form-check d-inline-block">
-                    <input class="form-check-input" type="checkbox" value="{{ answer.id }}" id="correct{{ answer.id }}"
+                    <input class="form-check-input correct-checkbox" type="checkbox" value="{{ answer.id }}" id="correct{{ answer.id }}"
                         {% if answer.is_correct %}checked{% endif %}
                         {% if user != question.author %}disabled{% endif %}>
                     <label class="form-check-label  {% if answer.is_correct %}correct-label{% endif %}"
