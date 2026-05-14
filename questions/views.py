@@ -34,7 +34,7 @@ def question(request, pk: int):
     else:
         form = AnswerForm()
 
-    answers = question_obj.answers.all().select_related('author')
+    answers = question_obj.answers.all().select_related('author').order_by('-is_correct', '-created_at')
     page_obj = paginate(answers, request)
     context = {
         'question': question_obj,
