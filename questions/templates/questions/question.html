@@ -6,7 +6,7 @@
 <div class="question-card mb-5">
     <div class="row g-3">
         <div class="col-auto text-center">
-            {% include 'questions/components/rating.html' with rating=question.rating id=question.id type='question' %}
+            {% include 'questions/components/rating.html' with rating=question.rating id=question.id type='question' user_vote=question.user_vote %}
         </div>
         <div class="col">
             <h3>{{ question.title }}</h3>
@@ -47,7 +47,7 @@
     <div class="answer-card {% if answer.is_correct %}correct-answer{% endif %}" id="answer-{{ answer.id }}">
         <div class="row g-3">
             <div class="col-auto text-center">
-                {% include 'questions/components/rating.html' with rating=answer.rating id=answer.id type='answer' %}
+                {% include 'questions/components/rating.html' with rating=answer.rating id=answer.id type='answer' user_vote=answer.user_vote %}
             </div>
 
             <div class="col">

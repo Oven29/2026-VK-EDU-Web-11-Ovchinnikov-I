@@ -11,18 +11,32 @@ class QuestionManager(models.Manager):
             .annotate(answers_count=models.Count('answers', distinct=True))
         )
 
-    def new(self):
-        return self._with_related().order_by('-created_at')
+    def new(self, user=None):
+        return self.with_user_vote(user).order_by('-created_at')
 
-    def hot(self):
-        return self._with_related().order_by('-rating', '-created_at')
+    def hot(self, user=None):
+        return self.with_user_vote(user).order_by('-rating', '-created_at')
 
-    def by_tag(self, tag_name):
-        return self._with_related().filter(tags__name=tag_name).distinct().order_by('-rating')
+    def by_tag(self, tag_name, user=None):
+        return self.with_user_vote(user).filter(tags__name=tag_name).distinct().order_by('-rating')
 
-    def by_author(self, username):
+    def by_author(self, username, user=None):
         """Возвращает вопросы конкретного пользователя"""
-        return self._with_related().filter(author__username=username).order_by('-created_at')
+        return self.with_user_vote(user).filter(author__username=username).order_by('-created_at')
+
+    def with_user_vote(self, user):
+        qs = self._with_related()
+        if user is None or not user.is_authenticated:
+            return qs.annotate(user_vote=models.Value(0, output_field=models.IntegerField()))
+
+        from .models import QuestionLike
+
+        vote_subquery = QuestionLike.objects.filter(
+            user=user,
+            question=models.OuterRef('pk')
+        ).values('value')
+
+        return qs.annotate(user_vote=models.Subquery(vote_subquery))
 
 
 class TagManager(models.Manager):
