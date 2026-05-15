@@ -30,7 +30,7 @@ $(document).ready(function () {
         const objectId = $container.data('id');
         const objectType = $container.data('type');
 
-        if ($this.hasClass('pe-none')) {
+        if ($this.hasClass('disabled')) {
             return;
         }
 

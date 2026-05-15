@@ -57,7 +57,7 @@
                     <input class="form-check-input correct-checkbox" type="checkbox" value="{{ answer.id }}" id="correct{{ answer.id }}"
                         {% if answer.is_correct %}checked{% endif %}
                         {% if user != question.author %}disabled{% endif %}>
-                    <label class="form-check-label  {% if answer.is_correct %}correct-label{% endif %}"
+                    <label class="form-check-label {% if answer.is_correct %}opacity-100 correct-label{% endif %}"
                         for="correct{{ answer.id }}">Верно!</label>
                 </div>
 
