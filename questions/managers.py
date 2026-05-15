@@ -1,5 +1,5 @@
 from django.db import models, transaction
-from django.db.models import F
+from django.db.models import F, Value, OuterRef, Subquery, IntegerField
 
 
 class QuestionManager(models.Manager):
@@ -28,16 +28,15 @@ class QuestionManager(models.Manager):
     def with_user_vote(self, user):
         qs = self._with_related()
         if user is None or not user.is_authenticated:
-            return qs.annotate(user_vote=models.Value(0, output_field=models.IntegerField()))
+            return qs.annotate(user_vote=Value(0, output_field=IntegerField()))
 
         from .models import QuestionLike
-
         vote_subquery = QuestionLike.objects.filter(
             user=user,
-            question=models.OuterRef('pk')
+            question=OuterRef('pk')
         ).values('value')
 
-        return qs.annotate(user_vote=models.Subquery(vote_subquery))
+        return qs.annotate(user_vote=Subquery(vote_subquery))
 
 
 class TagManager(models.Manager):
@@ -50,6 +49,7 @@ class TagManager(models.Manager):
 class LikeManager(models.Manager):
     @transaction.atomic
     def toggle_vote(self, user, obj, value):
+        # Determine if it's QuestionLike or AnswerLike
         lookup_field = 'question' if hasattr(self.model, 'question') else 'answer'
         lookup = {lookup_field: obj, 'user': user}
         
@@ -68,12 +68,28 @@ class LikeManager(models.Manager):
             
         obj.save()
         obj.refresh_from_db()
-
         return obj.rating
 
 
 class AnswerManager(models.Manager):
+    def with_user_vote(self, user):
+        qs = self.get_queryset().select_related('author', 'author__profile')
+        if user is None or not user.is_authenticated:
+            return qs.annotate(user_vote=Value(0, output_field=IntegerField()))
+            
+        from .models import AnswerLike
+        vote_subquery = AnswerLike.objects.filter(
+            user=user, 
+            answer=OuterRef('pk')
+        ).values('value')
+        
+        return qs.annotate(user_vote=Subquery(vote_subquery))
+
+    def get_for_question(self, question, user=None):
+        return self.with_user_vote(user).filter(question=question).order_by('-is_correct', '-created_at')
+
     def toggle_correct(self, user, answer_id):
+        # Need to fetch the object here to check permissions
         answer = self.get_queryset().select_related('question').get(pk=answer_id)
         
         if user != answer.question.author:
@@ -87,5 +103,4 @@ class AnswerManager(models.Manager):
                 answer.question.answers.all().update(is_correct=False)
                 answer.is_correct = True
                 answer.save()
-
         return True, answer.is_correct

@@ -4,7 +4,6 @@ from django.contrib.auth.decorators import login_required
 from django.urls import reverse
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
-from django.db.models import Value, OuterRef, Subquery, IntegerField
 
 from .models import Question, Tag, Answer, QuestionLike, AnswerLike
 from .utils import paginate
@@ -36,19 +35,8 @@ def question(request, pk: int):
     else:
         form = AnswerForm()
 
-    answers_qs = question_obj.answers.all().select_related('author')
-    
-    if request.user.is_authenticated:
-        vote_subquery = AnswerLike.objects.filter(
-            user=request.user, 
-            answer=OuterRef('pk')
-        ).values('value')
-        answers_qs = answers_qs.annotate(user_vote=Subquery(vote_subquery))
-    else:
-        answers_qs = answers_qs.annotate(user_vote=Value(0, output_field=IntegerField()))
-
-    answers = answers_qs.order_by('-is_correct', '-created_at')
-    page_obj = paginate(answers, request)
+    answers_qs = Answer.objects.get_for_question(question_obj, request.user)
+    page_obj = paginate(answers_qs, request)
     context = {
         'question': question_obj,
         'answers': page_obj,
@@ -133,8 +121,8 @@ def vote_answer(request):
 @require_POST
 def mark_correct(request):
     answer_id = request.POST.get('id')
-    answer = get_object_or_404(Answer, pk=answer_id)
-    success, result = Answer.objects.toggle_correct(request.user, answer.id)
+    
+    success, result = Answer.objects.toggle_correct(request.user, answer_id)
     
     if not success:
         return JsonResponse({'error': result}, status=403)
