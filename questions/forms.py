@@ -1,4 +1,6 @@
 from django import forms
+from django.db import transaction
+
 from .models import Question, Answer, Tag
 
 
@@ -36,8 +38,9 @@ class QuestionForm(forms.ModelForm):
         if author:
             question.author = author
         if commit:
-            question.save()
-            self._save_tags(question)
+            with transaction.atomic():
+                question.save()
+                self._save_tags(question)
         return question
 
 
