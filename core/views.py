@@ -42,9 +42,7 @@ class SignupView(UserPassesTestMixin, CreateView):
 class LogoutView(View):
     def get(self, request):
         auth.logout(request)
-        next_page = request.META.get(
-            'HTTP_REFERER', settings.LOGIN_REDIRECT_URL)
-        return redirect(next_page)
+        return redirect('index')
 
 
 @method_decorator(login_required, name='dispatch')
