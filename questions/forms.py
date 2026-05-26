@@ -33,10 +33,9 @@ class QuestionForm(forms.ModelForm):
                 tag, created = Tag.objects.get_or_create(name=name)
                 question.tags.add(tag)
 
-    def save(self, commit=True, author=None):
+    def save(self, author, commit=True):
         question = super().save(commit=False)
-        if author:
-            question.author = author
+        question.author = author
         if commit:
             with transaction.atomic():
                 question.save()
@@ -60,12 +59,10 @@ class AnswerForm(forms.ModelForm):
             }),
         }
 
-    def save(self, commit=True, author=None, question=None):
+    def save(self, author, question, commit=True):
         answer = super().save(commit=False)
-        if author:
-            answer.author = author
-        if question:
-            answer.question = question
+        answer.author = author
+        answer.question = question
         if commit:
             answer.save()
         return answer
