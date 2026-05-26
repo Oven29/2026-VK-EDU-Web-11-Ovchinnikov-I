@@ -21,6 +21,7 @@ class TagAdmin(admin.ModelAdmin):
 @admin.register(Question)
 class QuestionAdmin(admin.ModelAdmin):
     list_display = ('id', 'title', 'author', 'rating', 'created_at')
+    list_select_related = ('author',)
     list_filter = ('created_at', 'tags')
     search_fields = ('title', 'content')
     raw_id_fields = ('author',)
@@ -28,24 +29,22 @@ class QuestionAdmin(admin.ModelAdmin):
     inlines = [AnswerInline]
 
     def get_queryset(self, request):
-        qs = super().get_queryset(request)
-        return qs.select_related('author').prefetch_related('tags')
+        return super().get_queryset(request).prefetch_related('tags')
 
 
 @admin.register(Answer)
 class AnswerAdmin(admin.ModelAdmin):
     list_display = ('id', 'question', 'author', 'is_correct', 'rating', 'created_at')
+    list_select_related = ('author', 'question')
     list_filter = ('is_correct', 'created_at')
     search_fields = ('content',)
     raw_id_fields = ('author', 'question')
-
-    def get_queryset(self, request):
-        return super().get_queryset(request).select_related('author', 'question')
 
 
 @admin.register(QuestionLike)
 class QuestionLikeAdmin(admin.ModelAdmin):
     list_display = ('user', 'question', 'value', 'created_at')
+    list_select_related = ('user', 'question')
     list_filter = ('value',)
     raw_id_fields = ('user', 'question')
 
@@ -53,5 +52,6 @@ class QuestionLikeAdmin(admin.ModelAdmin):
 @admin.register(AnswerLike)
 class AnswerLikeAdmin(admin.ModelAdmin):
     list_display = ('user', 'answer', 'value', 'created_at')
+    list_select_related = ('user', 'answer')
     list_filter = ('value',)
     raw_id_fields = ('user', 'answer')
