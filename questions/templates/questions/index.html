@@ -39,9 +39,9 @@
                 <div>
                     <small>
                         <a href="{% url 'user_questions' q.author.username %}" class="fw-medium">
-                            <img src="{{ q.author.profile.photo.url }}" alt="{{ q.author.name }}"
+                            <img src="{{ q.author.profile.photo.url }}" alt="{{ q.author|name }}"
                                 class="avatar-box-sm me-1 mb-2">
-                            {{ q.author.profile.name }}
+                            {{ q.author|name }}
                         </a>
                     </small>
                 </div>

@@ -76,6 +76,12 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'questions.context_processors.sidebar_data',
             ],
+            'libraries': {
+                'core_tags': 'core.templatetags.core_tags',
+            },
+            'builtins': [
+                'core.templatetags.core_tags',
+            ],
         },
     },
 ]

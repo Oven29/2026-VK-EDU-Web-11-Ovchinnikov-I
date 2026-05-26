@@ -73,7 +73,7 @@
                     <ul class="list-unstyled">
                         {% for member in best_members %}
                         <li><a href="{% url 'user_questions' member.user.username %}" class="text-decoration-none">
-                                {{member.name }}
+                                {{ member|name }}
                             </a>
                         </li>
                         {% endfor %}
