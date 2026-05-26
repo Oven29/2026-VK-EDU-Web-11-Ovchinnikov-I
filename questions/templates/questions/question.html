@@ -100,26 +100,7 @@
     <form method="post" action="{% url 'question' question.id %}">
         {% csrf_token %}
         
-        {% if form.non_field_errors %}
-        <div class="alert alert-danger">
-            {% for error in form.non_field_errors %}
-            {{ error }}
-            {% endfor %}
-        </div>
-        {% endif %}
-
-        {% for field in form %}
-        <div class="mb-3">
-            {{ field }}
-            {% if field.errors %}
-            <div class="text-danger small">
-                {% for error in field.errors %}
-                {{ error }}
-                {% endfor %}
-            </div>
-            {% endif %}
-        </div>
-        {% endfor %}
+        {% include "core/includes/form_fields.html" with hide_labels=True %}
         
         <button type="submit" class="btn btn-dark px-4">Ответить</button>
     </form>
