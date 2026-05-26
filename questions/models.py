@@ -111,8 +111,7 @@ class Answer(DefaultModel):
     objects = AnswerManager()
 
     def __str__(self):
-        author_name = self.author.username if self.author else "Удаленный пользователь"
-        return f'Ответ на "{self.question.title}" от {author_name}'
+        return f'Ответ {self.id}'
 
     @transaction.atomic
     def save(self, *args, **kwargs):

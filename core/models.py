@@ -46,7 +46,7 @@ class Profile(models.Model):
         self.save(update_fields=['answer_cnt'])
 
     def __str__(self):
-        return f'Профиль {self.user.username}'
+        return f'Профиль {self.user_id}'
 
     @property
     def name(self):
