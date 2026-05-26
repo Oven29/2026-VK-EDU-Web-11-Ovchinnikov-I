@@ -15,11 +15,6 @@ const getCookie = (name) => {
 
 const csrftoken = getCookie('csrftoken');
 
-const validEmail = (email) => {
-    const emailRegex = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/;
-    return emailRegex.test(email);
-}
-
 $(document).ready(function () {
     $('.vote-btn').on('click', function () {
         const $this = $(this);
@@ -114,10 +109,5 @@ $(document).ready(function () {
         }
     
         $counter.text(`${countSymbols}/3000`);
-    }).trigger('input');
-
-    $('.email-input').on('input', function () {
-        const text = $(this).val();
-        $('.error-msg').text(!validEmail(text) && text ? 'Invalid email address' : '');
     }).trigger('input');
 });
