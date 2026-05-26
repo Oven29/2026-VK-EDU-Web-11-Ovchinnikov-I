@@ -1,76 +1,60 @@
 from django.shortcuts import render, redirect
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
-from django.utils.http import url_has_allowed_host_and_scheme
+from django.utils.decorators import method_decorator
 from django.conf import settings
+from django.views.generic import CreateView, UpdateView, View
+from django.contrib.auth.views import LoginView as DjangoLoginView
+from django.contrib.auth.mixins import UserPassesTestMixin
+from django.urls import reverse_lazy
+
 from .forms import LoginForm, SignupForm, SettingsForm
 
 
-def login(request):
-    next_url = request.GET.get('next', '')
-    if request.method == 'POST':
-        form = LoginForm(data=request.POST)
-        if form.is_valid():
-            user = form.get_user()
-            auth.login(request, user)
+class LoginView(DjangoLoginView):
+    form_class = LoginForm
+    template_name = 'core/login.html'
+    redirect_authenticated_user = True
 
-            redirect_to = request.POST.get('next', '')
-            if not url_has_allowed_host_and_scheme(
-                url=redirect_to,
-                allowed_hosts={request.get_host()},
-                require_https=request.is_secure(),
-            ):
-                redirect_to = settings.LOGIN_REDIRECT_URL
-            return redirect(redirect_to)
-
-    else:
-        form = LoginForm()
-
-    context = {
-        'form': form,
-        'next': next_url,
-    }
-
-    return render(request, 'core/login.html', context)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['next'] = self.request.GET.get('next', '')
+        return context
 
 
-def signup(request):
-    if request.method == 'POST':
-        form = SignupForm(request.POST, request.FILES)
-        if form.is_valid():
-            user = form.save()
-            auth.login(request, user)
-            return redirect(settings.LOGIN_REDIRECT_URL)
+class SignupView(UserPassesTestMixin, CreateView):
+    form_class = SignupForm
+    template_name = 'core/signup.html'
+    success_url = reverse_lazy('index')
 
-    else:
-        form = SignupForm()
+    def test_func(self):
+        return not self.request.user.is_authenticated
 
-    context = {'form': form}
+    def handle_no_permission(self):
+        return redirect('index')
 
-    return render(request, 'core/signup.html', context)
-
-
-def logout(request):
-    auth.logout(request)
-    next_page = request.META.get('HTTP_REFERER', settings.LOGIN_REDIRECT_URL)
-
-    return redirect(next_page)
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        auth.login(self.request, self.object)
+        return response
 
 
-@login_required
-def profile(request):
-    if request.method == 'POST':
-        form = SettingsForm(request.POST, request.FILES, instance=request.user)
-        if form.is_valid():
-            form.save()
-            return redirect('profile')
+class LogoutView(View):
+    def get(self, request):
+        auth.logout(request)
+        next_page = request.META.get(
+            'HTTP_REFERER', settings.LOGIN_REDIRECT_URL)
+        return redirect(next_page)
 
-    else:
-        form = SettingsForm(instance=request.user)
 
-    context = {'form': form}
+@method_decorator(login_required, name='dispatch')
+class SettingsView(UpdateView):
+    form_class = SettingsForm
+    template_name = 'core/profile.html'
+    success_url = reverse_lazy('profile')
 
-    return render(request, 'core/profile.html', context)
+    def get_object(self, queryset=None):
+        return self.request.user
 
 
 def page_not_found(request, exception):
