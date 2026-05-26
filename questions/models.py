@@ -6,9 +6,33 @@ from django.contrib.auth.models import User
 from .managers import QuestionManager, TagManager, LikeManager, AnswerManager
 
 
+class DefaultModel(models.Model):
+    """Abstract base model with common fields."""
+
+    updated_at = models.DateTimeField(
+        auto_now=True,
+        verbose_name='Обновлено в'
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name='Создано в'
+    )
+    is_active = models.BooleanField(
+        default=True,
+        verbose_name='Активно?'
+    )
+
+    class Meta:
+        abstract = True
+
+
 class Tag(models.Model):
-    name = models.CharField(max_length=63, unique=True,
-                            db_index=True, verbose_name='Название')
+    name = models.CharField(
+        max_length=63,
+        unique=True,
+        db_index=True,
+        verbose_name='Название'
+    )
 
     objects = TagManager()
 
@@ -20,16 +44,32 @@ class Tag(models.Model):
         verbose_name_plural = 'Теги'
 
 
-class Question(models.Model):
-    title = models.CharField(max_length=255, verbose_name='Заголовок')
-    content = models.TextField(verbose_name='Содержание')
+class Question(DefaultModel):
+    title = models.CharField(
+        max_length=255,
+        verbose_name='Заголовок'
+    )
+    content = models.TextField(
+        max_length=3000,
+        verbose_name='Содержание'
+    )
     author = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='questions', verbose_name='Автор')
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='questions',
+        verbose_name='Автор'
+    )
     tags = models.ManyToManyField(
-        Tag, blank=True, related_name='questions', verbose_name='Теги')
-    rating = models.IntegerField(default=0, verbose_name='Рейтинг')
-    created_at = models.DateTimeField(
-        auto_now_add=True, verbose_name='Дата создания')
+        Tag,
+        blank=True,
+        related_name='questions',
+        verbose_name='Теги'
+    )
+    rating = models.IntegerField(
+        default=0,
+        verbose_name='Рейтинг'
+    )
 
     objects = QuestionManager()
 
@@ -41,22 +81,38 @@ class Question(models.Model):
         verbose_name_plural = 'Вопросы'
 
 
-class Answer(models.Model):
-    content = models.TextField(verbose_name='Контент')
+class Answer(DefaultModel):
+    content = models.TextField(
+        max_length=3000,
+        verbose_name='Контент'
+    )
     author = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='answers', verbose_name='Автор')
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='answers',
+        verbose_name='Автор'
+    )
     question = models.ForeignKey(
-        Question, on_delete=models.CASCADE, related_name='answers', verbose_name='Вопрос')
+        Question,
+        on_delete=models.CASCADE,
+        related_name='answers',
+        verbose_name='Вопрос'
+    )
     is_correct = models.BooleanField(
-        default=False, verbose_name='Правильный ответ')
-    rating = models.IntegerField(default=0, verbose_name='Рейтинг')
-    created_at = models.DateTimeField(
-        auto_now_add=True, verbose_name='Дата создания')
+        default=False,
+        verbose_name='Правильный ответ'
+    )
+    rating = models.IntegerField(
+        default=0,
+        verbose_name='Рейтинг'
+    )
 
     objects = AnswerManager()
 
     def __str__(self):
-        return f'Ответ на "{self.question.title}" от {self.author.username}'
+        author_name = self.author.username if self.author else "Удаленный пользователь"
+        return f'Ответ на "{self.question.title}" от {author_name}'
 
     class Meta:
         verbose_name = 'Ответ'
@@ -82,7 +138,9 @@ class LikeAbstract(models.Model):
         verbose_name='Значение'
     )
     created_at = models.DateTimeField(
-        auto_now_add=True, verbose_name='Дата создания')
+        auto_now_add=True,
+        verbose_name='Дата создания'
+    )
 
     objects = LikeManager()
 
