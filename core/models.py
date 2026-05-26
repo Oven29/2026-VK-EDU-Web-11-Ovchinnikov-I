@@ -36,6 +36,15 @@ class Profile(models.Model):
 
     objects = ProfileManager()
 
+    def sync_answer_cnt(self):
+        """Synchronizes the answer_cnt field with the actual count of active answers."""
+        from questions.models import Answer
+        self.answer_cnt = Answer.objects.filter(
+            author_id=self.user_id,
+            is_active=True
+        ).count()
+        self.save(update_fields=['answer_cnt'])
+
     def __str__(self):
         return f'Профиль {self.user.username}'
 

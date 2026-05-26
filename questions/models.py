@@ -1,6 +1,6 @@
 import re
 
-from django.db import models
+from django.db import models, transaction
 from django.contrib.auth.models import User
 
 from .managers import QuestionManager, TagManager, LikeManager, AnswerManager
@@ -113,6 +113,26 @@ class Answer(DefaultModel):
     def __str__(self):
         author_name = self.author.username if self.author else "Удаленный пользователь"
         return f'Ответ на "{self.question.title}" от {author_name}'
+
+    @transaction.atomic
+    def save(self, *args, **kwargs):
+        is_new = self.pk is None
+        super().save(*args, **kwargs)
+        if is_new and self.author_id:
+            from core.models import Profile
+            profile = Profile.objects.filter(user_id=self.author_id).first()
+            if profile:
+                profile.sync_answer_cnt()
+
+    @transaction.atomic
+    def delete(self, *args, **kwargs):
+        author_id = self.author_id
+        super().delete(*args, **kwargs)
+        if author_id:
+            from core.models import Profile
+            profile = Profile.objects.filter(user_id=author_id).first()
+            if profile:
+                profile.sync_answer_cnt()
 
     class Meta:
         verbose_name = 'Ответ'

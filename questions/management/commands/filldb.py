@@ -39,10 +39,17 @@ class Command(BaseCommand):
         users = self._create_users()
         questions = self._create_questions(users, tags)
         self._create_answers(users, questions)
+        self._sync_profiles_answer_cnt()
         self._create_likes(users, questions)
         self._recalculate_ratings()
 
         self._log("Готово!")
+
+    def _sync_profiles_answer_cnt(self):
+        self._log("Синхронизирую счетчики ответов в профилях...")
+        for profile in Profile.objects.all():
+            profile.sync_answer_cnt()
+        self._log("Счетчики ответов синхронизированы")
 
     def _create_tags(self):
         tags = [
@@ -105,7 +112,7 @@ class Command(BaseCommand):
         total_count = self.ratio * 100
         for _ in range(total_count):
             answers_batch.append(Answer(
-                text=self.faker.paragraph(),
+                content=self.faker.paragraph(),
                 author=random.choice(users),
                 question=random.choice(questions),
                 is_correct=random.choice([False] * 10 + [True])

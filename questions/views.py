@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.urls import reverse
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
+from django.db import transaction
 
 from .models import Question, Tag, Answer, QuestionLike, AnswerLike
 from .utils import paginate
@@ -30,7 +31,9 @@ def question(request, pk: int):
             return redirect('login')
         form = AnswerForm(request.POST)
         if form.is_valid():
-            answer = form.save(author=request.user, question=question_obj)
+            with transaction.atomic():
+                answer = form.save(author=request.user, question=question_obj)
+                request.user.profile.sync_answer_cnt()
             return redirect(reverse('question', kwargs={'pk': pk}) + f'#answer-{answer.id}')
     else:
         form = AnswerForm()
