@@ -1,4 +1,24 @@
 services:
+  db:
+    image: postgres:15
+    container_name: IvanAsk_postgres
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    restart: unless-stopped
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    networks:
+      - common
+
+  redis:
+    image: redis:7-alpine
+    container_name: IvanAsk_redis
+    restart: unless-stopped
+    networks:
+      - common
+
   app:
     container_name: IvanAsk
     build:
@@ -10,26 +30,47 @@ services:
     volumes:
       - .:/app
       - django_media:/app/media
+    env_file:
+      - .env
     ports:
       - "8000:8000"
     networks:
       - common
     depends_on:
       - db
+      - redis
 
-  db:
-    image: postgres
-    container_name: IvanAsk_postgres
-    environment:
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_DB: ${DB_NAME}
-      POSTGRES_PORT: ${DB_PORT}
+  worker:
+    container_name: IvanAsk_worker
+    build:
+      context: .
     restart: unless-stopped
+    command: celery -A application worker --loglevel=info
     volumes:
-      - db-data:/var/lib/postgresql/data
+      - .:/app
+    env_file:
+      - .env
     networks:
       - common
+    depends_on:
+      - db
+      - redis
+
+  beat:
+    container_name: IvanAsk_beat
+    build:
+      context: .
+    restart: unless-stopped
+    command: celery -A application beat --loglevel=info
+    volumes:
+      - .:/app
+    env_file:
+      - .env
+    networks:
+      - common
+    depends_on:
+      - db
+      - redis
 
 volumes:
   django_media:
