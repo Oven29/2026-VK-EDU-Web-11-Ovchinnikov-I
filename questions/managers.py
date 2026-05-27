@@ -60,6 +60,7 @@ class LikeManager(models.Manager):
             if like.value == value:
                 # Если нажали на ту же кнопку, убираем голос
                 like.value = 0
+                like.save()
             else:
                 # Если нажали на противоположную кнопку, меняем голос
                 like.value = value
