@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ question.title|truncatechars:50 }}{% endblock %}
+{% block title %}{{ block.super }} - {{ question.title|truncatechars:50 }}{% endblock %}
 
 {% block content %}
 <div class="question-card mb-5">
