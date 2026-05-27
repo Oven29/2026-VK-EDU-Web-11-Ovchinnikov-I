@@ -11,6 +11,11 @@ services:
       - db-data:/var/lib/postgresql/data
     networks:
       - common
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   redis:
     image: redis:7-alpine
@@ -37,8 +42,10 @@ services:
     networks:
       - common
     depends_on:
-      - db
-      - redis
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
 
   worker:
     container_name: IvanAsk_worker
@@ -53,8 +60,10 @@ services:
     networks:
       - common
     depends_on:
-      - db
-      - redis
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
 
   beat:
     container_name: IvanAsk_beat
@@ -69,8 +78,10 @@ services:
     networks:
       - common
     depends_on:
-      - db
-      - redis
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
 
   centrifugo:
     image: centrifugo/centrifugo:v5
