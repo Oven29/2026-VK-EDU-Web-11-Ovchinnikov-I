@@ -128,8 +128,10 @@ CELERY_BEAT_SCHEDULER = "redbeat.RedBeatScheduler"
 CELERY_REDBEAT_REDIS_URL = f"redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_BEAT_DB}"
 
 # Centrifugo real-time settings
-CENTRIFUGO_WS_URL = env("CENTRIFUGO_WS_URL", default="ws://localhost:8010/connection/websocket")
-CENTRIFUGO_API_URL = env("CENTRIFUGO_API_URL", default="http://localhost:8010/api")
+CENTRIFUGO_WS_URL = env("CENTRIFUGO_WS_URL",
+                        default="ws://localhost:8010/connection/websocket")
+CENTRIFUGO_API_URL = env("CENTRIFUGO_API_URL",
+                         default="http://localhost:8010/api")
 CENTRIFUGO_API_KEY = env("CENTRIFUGO_API_KEY")
 CENTRIFUGO_SECRET = env("CENTRIFUGO_SECRET")
 
@@ -145,6 +147,11 @@ CELERY_BEAT_SCHEDULE = {
     },
 }
 
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = env("EMAIL_HOST", default="localhost")
+EMAIL_PORT = env.int("EMAIL_PORT", default=1025)
+EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS", default=False)
+DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default="noreply@ivanask.local")
 
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators

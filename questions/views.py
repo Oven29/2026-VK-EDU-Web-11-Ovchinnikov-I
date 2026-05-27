@@ -10,7 +10,7 @@ from core.templatetags.core_tags import name_filter
 from .models import Question, Tag, Answer, QuestionLike, AnswerLike
 from .utils import paginate, get_centrifugo_token
 from .forms import QuestionForm, AnswerForm
-from .tasks import publish_answer_to_centrifugo
+from .tasks import publish_answer_to_centrifugo, send_notification_email
 
 
 def index(request):
@@ -28,7 +28,7 @@ def question(request, pk: int):
         Question.objects.with_user_vote(request.user).prefetch_related('tags'),
         pk=pk,
     )
-    
+
     if request.method == 'POST':
         if not request.user.is_authenticated:
             return redirect('login')
@@ -37,7 +37,7 @@ def question(request, pk: int):
             with transaction.atomic():
                 answer = form.save(author=request.user, question=question_obj)
                 request.user.profile.sync_answer_cnt()
-            
+
             # Publish new answer notification to Centrifugo
             answer_data = {
                 'id': answer.id,
@@ -50,8 +50,16 @@ def question(request, pk: int):
                 'created_at': answer.created_at.strftime('%H:%M:%S'),
             }
             publish_answer_to_centrifugo.delay(question_obj.id, answer_data)
+
+            question_path = reverse('question', kwargs={'pk': pk}) +\
+                f'#answer-{answer.id}'
+            send_notification_email.delay(
+                answer.author.email,
+                request.build_absolute_uri(question_path),
+                question_obj.title,
+            )
             
-            return redirect(reverse('question', kwargs={'pk': pk}) + f'#answer-{answer.id}')
+            return redirect(question_path)
     else:
         form = AnswerForm()
 
