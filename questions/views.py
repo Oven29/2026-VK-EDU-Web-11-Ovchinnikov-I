@@ -85,7 +85,7 @@ def hot(request):
 
 def user_questions(request, username: str):
     user = get_object_or_404(User, username=username)
-    page_obj = paginate(Question.objects.by_author(user.username, request.user), request)
+    page_obj = paginate(Question.objects.by_author(user.id, request.user), request)
     context = {
         'questions': page_obj,
         'title': f'{username}\'s questions',

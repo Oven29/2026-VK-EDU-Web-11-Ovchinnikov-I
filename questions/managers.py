@@ -21,9 +21,9 @@ class QuestionManager(models.Manager):
     def by_tag(self, tag_name, user=None):
         return self.with_user_vote(user).filter(tags__name=tag_name).distinct().order_by('-rating')
 
-    def by_author(self, username, user=None):
+    def by_author(self, author_id, user=None):
         """Возвращает вопросы конкретного пользователя"""
-        return self.with_user_vote(user).filter(author__username=username).order_by('-created_at')
+        return self.with_user_vote(user).filter(author_id=author_id).order_by('-created_at')
 
     def with_user_vote(self, user):
         qs = self._with_related()
