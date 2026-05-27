@@ -9,7 +9,7 @@ def name_filter(user):
     Returns formatted user name: 'FirstName L.' or 'Username'
     """
     if not user:
-        return ""
+        return "u/DELETED"
         
     if not isinstance(user, User):
         if hasattr(user, 'user'):
