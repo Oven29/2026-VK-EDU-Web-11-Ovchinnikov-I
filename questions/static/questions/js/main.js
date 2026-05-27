@@ -109,76 +109,81 @@ $(document).ready(function () {
 
     // Centrifugo Real-time updates
     const $answersList = $('.answers-list');
-    const centrifugoUrl = $answersList.data('centrifugo-url');
-    const centrifugoToken = $answersList.data('centrifugo-token');
-    const questionId = $answersList.data('question-id');
+    if ($answersList.length) {
+        const centrifugoUrl = $answersList.data('centrifugo-url');
+        const centrifugoToken = $answersList.data('centrifugo-token');
+        const questionId = $answersList.data('question-id');
+        const currentPage = parseInt($answersList.data('page')) || 1;
 
-    if (centrifugoUrl && centrifugoToken && questionId) {
-        const centrifuge = new Centrifuge(centrifugoUrl, {
-            token: centrifugoToken
-        });
+        if (centrifugoUrl && centrifugoToken && questionId) {
+            const centrifuge = new Centrifuge(`${centrifugoUrl}`, {
+                token: centrifugoToken
+            });
 
-        centrifuge.on('connecting', function (ctx) {
-            console.log(`connecting: ${ctx.code}, ${ctx.reason}`);
-        }).on('connected', function (ctx) {
-            console.log(`connected over ${ctx.transport}`);
-        }).on('disconnected', function (ctx) {
-            console.log(`disconnected: ${ctx.code}, ${ctx.reason}`);
-        }).connect();
+            centrifuge.on('connecting', ctx => {
+                console.log(`connecting: ${ctx.code}, ${ctx.reason}`);
+            }).on('connected', ctx => {
+                console.log(`connected over ${ctx.transport}`);
+            }).on('disconnected', ctx => {
+                console.log(`disconnected: ${ctx.code}, ${ctx.reason}`);
+            }).connect();
 
-        const sub = centrifuge.newSubscription(`question_${questionId}`);
+            const sub = centrifuge.newSubscription(`questions:${questionId}`);
 
-        sub.on('publication', function (ctx) {
-            const data = ctx.data;
-            
-            // Get current page from URL
-            const urlParams = new URLSearchParams(window.location.search);
-            const page = parseInt(urlParams.get('page')) || 1;
+            sub.on('publication', ctx => {
+                const data = ctx.data;
 
-            if (page === 1) {
-                $('.empty-state').remove();
+                if (currentPage === 1) {
+                    // Remove empty state if present
+                    $('.empty-state').remove();
 
-                const answerHtml = `
-                    <div class="answer-card" id="answer-${data.id}">
-                        <div class="row g-3">
-                            <div class="col-auto text-center">
-                                <div class="vote-widget" data-id="${data.id}" data-type="answer">
-                                    <span class="vote-btn vote-up" data-action="up">+</span>
-                                    <div class="vote-count">0</div>
-                                    <span class="vote-btn vote-down" data-action="down">-</span>
-                                </div>
-                            </div>
-                            <div class="col">
-                                <p>${data.content}</p>
-                                <div class="form-check d-inline-block">
-                                    <input class="form-check-input correct-checkbox" type="checkbox" value="${data.id}" id="correct${data.id}" disabled>
-                                    <label class="form-check-label" for="correct${data.id}">Верно!</label>
-                                </div>
-                                <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap gap-1">
-                                    <div>
-                                        <small>
-                                            <a href="/user/${data.username}/" class="fw-medium">${data.author}</a>
-                                        </small>
-                                    </div>
-                                    <div class="text-muted">
-                                        <small>${data.created_at}</small>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>`;
-                
-                const $newAnswer = $(answerHtml);
-                const $nav = $('.pagination').closest('nav');
-                
-                if ($nav.length) {
-                    $newAnswer.insertBefore($nav);
+                    // Clone template
+                    const $template = $('#answer-template .answer-card').clone();
+
+                    // Fill data
+                    $template.attr('id', `answer-${data.id}`);
+                    $template.find('.vote-widget').attr('data-id', data.id);
+                    $template.find('.answer-content-placeholder').text(data.content);
+
+                    const $checkbox = $template.find('.correct-checkbox-placeholder');
+                    $checkbox.attr('id', `correct${data.id}`).val(data.id);
+                    $template.find('label').attr('for', `correct${data.id}`);
+
+                    const $authorLink = $template.find('.answer-author-link');
+                    $authorLink.attr('href', `/user/${data.author.username}/`);
+                    $template.find('.answer-author-name').text(data.author.name);
+
+                    if (data.author.profile_photo_url) {
+                        $template.find('.answer-author-avatar').attr('src', data.author.profile_photo_url).show();
+                    }
+
+                    $template.find('.answer-date-placeholder').text(data.created_at);
+
+                    // Insert into DOM
+                    const $nav = $('.pagination').closest('nav');
+                    if ($nav.length) {
+                        $template.insertBefore($nav);
+                    } else {
+                        $answersList.append($template);
+                    }
+
+                    // Small fade-in effect
+                    $template.hide().fadeIn(500);
                 } else {
-                    $answersList.append($newAnswer);
+                    // Show Bootstrap Toast on other pages
+                    const toastEl = document.getElementById('new-answer-toast');
+                    if (toastEl) {
+                        const toast = new bootstrap.Toast(toastEl);
+                        toast.show();
+                    }
                 }
-            } else {
-                alert(`Новый ответ от ${data.author}!`);
-            }
-        }).subscribe();
+            }).on('subscribing', function (ctx) {
+                console.log(`subscribing: ${ctx.code}, ${ctx.reason}`);
+            }).on('subscribed', function (ctx) {
+                console.log('subscribed', ctx);
+            }).on('unsubscribed', function (ctx) {
+                console.log(`unsubscribed: ${ctx.code}, ${ctx.reason}`);
+            }).subscribe();
+        }
     }
 });

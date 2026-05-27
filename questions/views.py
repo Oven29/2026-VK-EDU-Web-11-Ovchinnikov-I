@@ -42,7 +42,11 @@ def question(request, pk: int):
             answer_data = {
                 'id': answer.id,
                 'content': answer.content,
-                'author': name_filter(answer.author),
+                'author': {
+                    'name': name_filter(answer.author),
+                    'username': answer.author.username,
+                    'profile_photo_url': answer.author.profile.photo.url if answer.author.profile.photo else None,
+                },
                 'created_at': answer.created_at.strftime('%H:%M:%S'),
             }
             publish_answer_to_centrifugo.delay(question_obj.id, answer_data)

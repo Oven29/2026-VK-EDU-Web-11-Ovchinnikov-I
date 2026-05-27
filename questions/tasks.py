@@ -27,7 +27,7 @@ def publish_answer_to_centrifugo(question_id: int, answer_data: dict):
         api_key=settings.CENTRIFUGO_API_KEY,
         timeout=10
     )
-    channel = f"question_{question_id}"
+    channel = f"questions:{question_id}"
 
     request = PublishRequest(channel=channel, data=answer_data)
     client.publish(request)

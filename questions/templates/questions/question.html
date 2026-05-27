@@ -51,7 +51,9 @@
 <div class="answers-list" 
      data-centrifugo-url="{{ CENTRIFUGO_WS_URL }}" 
      data-centrifugo-token="{{ centrifugo_token }}" 
-     data-question-id="{{ question.id }}">
+     data-question-id="{{ question.id }}"
+     data-page="{{ answers.number }}">
+    
     {% for answer in answers %}
     <div class="answer-card {% if answer.is_correct %}correct-answer{% endif %}" id="answer-{{ answer.id }}">
         <div class="row g-3">
@@ -106,6 +108,55 @@
 
     {% include 'questions/components/nav.html' with page=answers %}
 
+</div>
+
+{# Hidden template for new answers via Centrifugo #}
+<div id="answer-template" style="display: none;">
+    <div class="answer-card">
+        <div class="row g-3">
+            <div class="col-auto text-center">
+                <div class="vote-widget" data-type="answer">
+                    <span class="vote-btn vote-up" data-action="up">+</span>
+                    <div class="vote-count">0</div>
+                    <span class="vote-btn vote-down" data-action="down">-</span>
+                </div>
+            </div>
+            <div class="col">
+                <p class="answer-content-placeholder"></p>
+                <div class="form-check d-inline-block">
+                    <input class="form-check-input correct-checkbox-placeholder" type="checkbox" disabled>
+                    <label class="form-check-label">Верно!</label>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap gap-1">
+                    <div>
+                        <small>
+                            <a href="#" class="fw-medium answer-author-link">
+                                <img src="" alt="" class="avatar-box-sm me-1 mb-2 answer-author-avatar" style="display: none;">
+                                <span class="answer-author-name"></span>
+                            </a>
+                        </small>
+                    </div>
+                    <div class="text-muted">
+                        <small class="answer-date-placeholder"></small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# Toast notification for new answers on other pages #}
+<div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1050;">
+    <div id="new-answer-toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header bg-primary text-white">
+            <strong class="me-auto">Новый ответ!</strong>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">
+            На этот вопрос только что пришел новый ответ. 
+            <a href="javascript:location.reload()" class="fw-bold">Обновите страницу</a>, чтобы увидеть его.
+        </div>
+    </div>
 </div>
 
 <div class="mt-5">
