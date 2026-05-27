@@ -78,7 +78,7 @@ def hot(request):
     page_obj = paginate(Question.objects.hot(request.user), request)
     context = {
         'questions': page_obj,
-        'title': 'Популярные вопросы',
+        'title': 'Топовые вопросы',
     }
 
     return render(request, 'questions/index.html', context)
