@@ -9,7 +9,7 @@ urlpatterns = [
     path('hot/', views.hot, name='hot'),
     path('user/<str:username>/', views.user_questions, name='user_questions'),
     # AJAX
-    path('vote/question/', views.vote_question, name='vote_question'),
-    path('vote/answer/', views.vote_answer, name='vote_answer'),
-    path('answer/correct/', views.mark_correct, name='mark_correct'),
+    path('vote/question/<int:pk>/', views.vote_question, name='vote_question'),
+    path('vote/answer/<int:pk>/', views.vote_answer, name='vote_answer'),
+    path('answer/correct/<int:pk>/', views.mark_correct, name='mark_correct'),
 ]

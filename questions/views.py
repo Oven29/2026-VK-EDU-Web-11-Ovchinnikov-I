@@ -96,12 +96,11 @@ def user_questions(request, username: str):
 
 @login_required
 @require_POST
-def vote_question(request):
-    question_id = request.POST.get('id')
+def vote_question(request, pk: int):
     vote_type = request.POST.get('type')
     value = 1 if vote_type == 'up' else -1
     
-    question_obj = get_object_or_404(Question.objects.filter(is_active=True), pk=question_id)
+    question_obj = get_object_or_404(Question.objects.filter(is_active=True), pk=pk)
     rating = QuestionLike.objects.toggle_vote(request.user, question_obj, value)
     
     return JsonResponse({'rating': rating})
@@ -109,12 +108,11 @@ def vote_question(request):
 
 @login_required
 @require_POST
-def vote_answer(request):
-    answer_id = request.POST.get('id')
+def vote_answer(request, pk: int):
     vote_type = request.POST.get('type')
     value = 1 if vote_type == 'up' else -1
     
-    answer_obj = get_object_or_404(Answer.objects.filter(is_active=True), pk=answer_id)
+    answer_obj = get_object_or_404(Answer.objects.filter(is_active=True), pk=pk)
     rating = AnswerLike.objects.toggle_vote(request.user, answer_obj, value)
     
     return JsonResponse({'rating': rating})
@@ -122,10 +120,8 @@ def vote_answer(request):
 
 @login_required
 @require_POST
-def mark_correct(request):
-    answer_id = request.POST.get('id')
-    
-    success, result = Answer.objects.toggle_correct(request.user, answer_id)
+def mark_correct(request, pk: int):
+    success, result = Answer.objects.toggle_correct(request.user, pk)
     
     if not success:
         return JsonResponse({'error': result}, status=403)
