@@ -6,9 +6,11 @@ from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from django.db import transaction
 
+from core.templatetags.core_tags import name_filter
 from .models import Question, Tag, Answer, QuestionLike, AnswerLike
-from .utils import paginate
+from .utils import paginate, get_centrifugo_token
 from .forms import QuestionForm, AnswerForm
+from .tasks import publish_answer_to_centrifugo
 
 
 def index(request):
@@ -35,16 +37,32 @@ def question(request, pk: int):
             with transaction.atomic():
                 answer = form.save(author=request.user, question=question_obj)
                 request.user.profile.sync_answer_cnt()
+            
+            # Publish new answer notification to Centrifugo
+            answer_data = {
+                'id': answer.id,
+                'content': answer.content,
+                'author': name_filter(answer.author),
+                'created_at': answer.created_at.strftime('%H:%M:%S'),
+            }
+            publish_answer_to_centrifugo.delay(question_obj.id, answer_data)
+            
             return redirect(reverse('question', kwargs={'pk': pk}) + f'#answer-{answer.id}')
     else:
         form = AnswerForm()
 
     answers_qs = Answer.objects.get_for_question(question_obj, request.user)
     page_obj = paginate(answers_qs, request)
+    
+    # Generate connection token for Centrifugo
+    user_id = str(request.user.id) if request.user.is_authenticated else ""
+    centrifugo_token = get_centrifugo_token(user_id)
+    
     context = {
         'question': question_obj,
         'answers': page_obj,
         'form': form,
+        'centrifugo_token': centrifugo_token,
     }
 
     return render(request, 'questions/question.html', context)
