@@ -12,4 +12,5 @@ urlpatterns = [
     path('vote/question/<int:pk>/', views.vote_question, name='vote_question'),
     path('vote/answer/<int:pk>/', views.vote_answer, name='vote_answer'),
     path('answer/correct/<int:pk>/', views.mark_correct, name='mark_correct'),
+    path('api/search/', views.search_api, name='search_api'),
 ]

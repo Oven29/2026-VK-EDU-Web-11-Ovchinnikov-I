@@ -107,6 +107,60 @@ $(document).ready(function () {
         $counter.text(`${countSymbols}/3000`);
     }).trigger('input');
 
+    // Search autocomplete logic
+    const $searchInput = $('#search-input');
+    const $searchResults = $('#search-results');
+
+    const debounce = (func, delay) => {
+        let timeout;
+        return function () {
+            const context = this;
+            const args = arguments;
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(context, args), delay);
+        };
+    };
+
+    const handleSearch = debounce(function () {
+        const query = $searchInput.val().trim();
+
+        if (query.length < 3) {
+            $searchResults.empty().hide();
+            return;
+        }
+
+        fetch(`/api/search/?q=${encodeURIComponent(query)}`)
+            .then(response => response.json())
+            .then(data => {
+                $searchResults.empty();
+
+                if (data.length > 0) {
+                    data.forEach(item => {
+                        const $link = $('<a>')
+                            .attr('href', `/question/${item.id}/`)
+                            .text(item.title);
+                        $searchResults.append($link);
+                    });
+                    $searchResults.show();
+                } else {
+                    $searchResults.hide();
+                }
+            })
+            .catch(error => {
+                console.error('Search error:', error);
+                $searchResults.hide();
+            });
+    }, 300);
+
+    $searchInput.on('input', handleSearch);
+
+    // Close search results when clicking outside
+    $(document).on('click', function (e) {
+        if (!$(e.target).closest('.position-relative').length) {
+            $searchResults.hide();
+        }
+    });
+
     // Centrifugo Real-time updates
     const $answersList = $('.answers-list');
     if ($answersList.length) {
