@@ -29,10 +29,12 @@
                 <a href="{% url 'question' q.id %}" class="me-3 text-decoration-underline">
                     answers ({{ q.answers_count }})
                 </a>
+                {% if q.tags.all %}
                 <span class="text-muted me-2">Tags:</span>
                 {% for tag in q.tags.all %}
                 <a href="{% url 'tag' tag.name  %}" class="me-2 tag">{{ tag }}</a>
                 {% endfor %}
+                {% endif %}
             </div>
 
             <div class="d-flex justify-content-between align-items-center mt-3">
