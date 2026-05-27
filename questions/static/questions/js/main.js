@@ -21,7 +21,7 @@ $(document).ready(function () {
         const action = $this.data('action');
         const $container = $this.closest('.vote-widget');
         const $counter = $container.find('.vote-count');
-        
+
         const objectId = $container.data('id');
         const objectType = $container.data('type');
 
@@ -29,7 +29,7 @@ $(document).ready(function () {
             return;
         }
 
-        const url = objectType === 'question' ? '/vote/question/' : '/vote/answer/';
+        const url = `/vote/${(objectType === 'question' ? 'question' : 'answer')}/${objectId}/`;
 
         $.ajax({
             url: url,
@@ -43,7 +43,7 @@ $(document).ready(function () {
             },
             success: function (data) {
                 $counter.text(data.rating);
-                
+
                 // Optional: toggle active classes for visual feedback
                 const $opposed = $this.siblings('.vote-btn');
                 if ($this.hasClass('active')) {
@@ -69,11 +69,8 @@ $(document).ready(function () {
         const $label = $card.find('.form-check-label');
 
         $.ajax({
-            url: '/answer/correct/',
+            url: `/answer/correct/${answerId}/`,
             method: 'POST',
-            data: {
-                'id': answerId
-            },
             headers: {
                 'X-CSRFToken': csrftoken
             },
@@ -83,7 +80,7 @@ $(document).ready(function () {
                     $('.answer-card').removeClass('correct-answer');
                     $('.form-check-label').removeClass('correct-label');
                     $('.correct-checkbox').not($this).prop('checked', false);
-                    
+
                     $card.addClass('correct-answer');
                     $label.addClass('correct-label');
                 } else {
@@ -107,7 +104,7 @@ $(document).ready(function () {
         if (countSymbols >= 3000) {
             $(this).val(text.slice(0, 3000));
         }
-    
+
         $counter.text(`${countSymbols}/3000`);
     }).trigger('input');
 });
