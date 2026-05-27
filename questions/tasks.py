@@ -1,6 +1,7 @@
 from celery import shared_task
 from django.conf import settings
-from cent import Client
+from cent import Client, PublishRequest
+
 from .utils import get_popular_tags, get_best_members
 
 
@@ -27,5 +28,8 @@ def publish_answer_to_centrifugo(question_id: int, answer_data: dict):
         timeout=10
     )
     channel = f"question_{question_id}"
-    client.publish(channel, answer_data)
+
+    request = PublishRequest(channel=channel, data=answer_data)
+    client.publish(request)
+
     return f"Published to {channel}"

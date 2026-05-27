@@ -16,6 +16,7 @@ const getCookie = (name) => {
 const csrftoken = getCookie('csrftoken');
 
 $(document).ready(function () {
+    // Vote logic
     $('.vote-btn').on('click', function () {
         const $this = $(this);
         const action = $this.data('action');
@@ -35,7 +36,6 @@ $(document).ready(function () {
             url: url,
             method: 'POST',
             data: {
-                'id': objectId,
                 'type': action
             },
             headers: {
@@ -44,7 +44,6 @@ $(document).ready(function () {
             success: function (data) {
                 $counter.text(data.rating);
 
-                // Optional: toggle active classes for visual feedback
                 const $opposed = $this.siblings('.vote-btn');
                 if ($this.hasClass('active')) {
                     $this.removeClass('active');
@@ -62,6 +61,7 @@ $(document).ready(function () {
         });
     });
 
+    // Mark correct logic
     $('.correct-checkbox').on('change', function () {
         const $this = $(this);
         const answerId = $this.val();
@@ -76,7 +76,6 @@ $(document).ready(function () {
             },
             success: function (data) {
                 if (data.is_correct) {
-                    // Remove correct status from other cards
                     $('.answer-card').removeClass('correct-answer');
                     $('.form-check-label').removeClass('correct-label');
                     $('.correct-checkbox').not($this).prop('checked', false);
@@ -90,12 +89,12 @@ $(document).ready(function () {
             },
             error: function (xhr) {
                 console.error('Error marking correct:', xhr.responseJSON);
-                // Revert checkbox state on error
                 $this.prop('checked', !$this.prop('checked'));
             }
         });
     });
 
+    // Editor symbol counter
     $('#editor').on('input', function () {
         const text = $(this).val();
         const countSymbols = text.length;
@@ -107,4 +106,79 @@ $(document).ready(function () {
 
         $counter.text(`${countSymbols}/3000`);
     }).trigger('input');
+
+    // Centrifugo Real-time updates
+    const $answersList = $('.answers-list');
+    const centrifugoUrl = $answersList.data('centrifugo-url');
+    const centrifugoToken = $answersList.data('centrifugo-token');
+    const questionId = $answersList.data('question-id');
+
+    if (centrifugoUrl && centrifugoToken && questionId) {
+        const centrifuge = new Centrifuge(`${centrifugoUrl}/connection/websocket`, {
+            token: centrifugoToken
+        });
+
+        centrifuge.on('connecting', function (ctx) {
+            console.log(`connecting: ${ctx.code}, ${ctx.reason}`);
+        }).on('connected', function (ctx) {
+            console.log(`connected over ${ctx.transport}`);
+        }).on('disconnected', function (ctx) {
+            console.log(`disconnected: ${ctx.code}, ${ctx.reason}`);
+        }).connect();
+
+        const sub = centrifuge.newSubscription(`question_${questionId}`);
+
+        sub.on('publication', function (ctx) {
+            const data = ctx.data;
+            
+            // Get current page from URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const page = parseInt(urlParams.get('page')) || 1;
+
+            if (page === 1) {
+                $('.empty-state').remove();
+
+                const answerHtml = `
+                    <div class="answer-card" id="answer-${data.id}">
+                        <div class="row g-3">
+                            <div class="col-auto text-center">
+                                <div class="vote-widget" data-id="${data.id}" data-type="answer">
+                                    <span class="vote-btn vote-up" data-action="up">+</span>
+                                    <div class="vote-count">0</div>
+                                    <span class="vote-btn vote-down" data-action="down">-</span>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <p>${data.content}</p>
+                                <div class="form-check d-inline-block">
+                                    <input class="form-check-input correct-checkbox" type="checkbox" value="${data.id}" id="correct${data.id}" disabled>
+                                    <label class="form-check-label" for="correct${data.id}">Верно!</label>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap gap-1">
+                                    <div>
+                                        <small>
+                                            <a href="/user/${data.username}/" class="fw-medium">${data.author}</a>
+                                        </small>
+                                    </div>
+                                    <div class="text-muted">
+                                        <small>${data.created_at}</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>`;
+                
+                const $newAnswer = $(answerHtml);
+                const $nav = $('.pagination').closest('nav');
+                
+                if ($nav.length) {
+                    $newAnswer.insertBefore($nav);
+                } else {
+                    $answersList.append($newAnswer);
+                }
+            } else {
+                alert(`Новый ответ от ${data.author}!`);
+            }
+        }).subscribe();
+    }
 });

@@ -48,7 +48,10 @@
 
 <hr>
 
-<div class="answers-list">
+<div class="answers-list" 
+     data-centrifugo-url="{{ CENTRIFUGO_URL }}" 
+     data-centrifugo-token="{{ centrifugo_token }}" 
+     data-question-id="{{ question.id }}">
     {% for answer in answers %}
     <div class="answer-card {% if answer.is_correct %}correct-answer{% endif %}" id="answer-{{ answer.id }}">
         <div class="row g-3">
