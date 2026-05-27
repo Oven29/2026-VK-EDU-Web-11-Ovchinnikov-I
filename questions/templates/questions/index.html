@@ -6,10 +6,20 @@
 
 {% block content %}
 <div class="d-flex align-items-baseline mb-4">
-    <h2 class="me-3">{{ title }}</h2>
-    {% if request.resolver_match.url_name != 'hot' %}
-    <a href="{% url 'hot' %}" class="text-decoration-none"><u>Hot Questions</u></a>
-    {% endif %}
+    <ul class="nav nav-pills mb-4">
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'index' %}active{% endif %}"
+                href="{% url 'index' %}">
+                Новые вопросы
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'hot' %}active{% endif %}"
+                href="{% url 'hot' %}">
+                Топовые вопросы
+            </a>
+        </li>
+    </ul>
 </div>
 
 <!-- вопросы -->
