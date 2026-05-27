@@ -63,7 +63,7 @@
                     <h3 class="sidebar-title">Популярные теги</h3>
                     <div class="tag-cloud fw-bold">
                         {% for tag in popular_tags %}
-                        <a href="{% url 'tag' tag.name %}" class="text-decoration-none tag">{{ tag }}</a>
+                        <a href="{% url 'tag' tag.name %}" class="text-decoration-none tag">{{ tag.name }}</a>
                         {% endfor %}
                     </div>
                 </div>
@@ -72,8 +72,8 @@
                     <h3 class="sidebar-title">Лучшие пользователи</h3>
                     <ul class="list-unstyled">
                         {% for member in best_members %}
-                        <li><a href="{% url 'user_questions' member.user.username %}" class="text-decoration-none">
-                                {{ member|name }}
+                        <li><a href="{% url 'user_questions' member.username %}" class="text-decoration-none">
+                                {{ member.name }}
                             </a>
                         </li>
                         {% endfor %}

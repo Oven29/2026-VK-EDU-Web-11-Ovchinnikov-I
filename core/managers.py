@@ -12,11 +12,13 @@ class ProfileManager(models.Manager):
 
         question_rating = Question.objects.filter(
             author=OuterRef('user'),
+            is_active=True,
             created_at__gte=one_week_ago
         ).values('author').annotate(total=Sum('rating')).values('total')
 
         answer_rating = Answer.objects.filter(
             author=OuterRef('user'),
+            is_active=True,
             created_at__gte=one_week_ago
         ).values('author').annotate(total=Sum('rating')).values('total')
 
