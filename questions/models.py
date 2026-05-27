@@ -2,6 +2,8 @@ import re
 
 from django.db import models, transaction
 from django.contrib.auth.models import User
+from django.contrib.postgres.indexes import GinIndex
+from django.contrib.postgres.search import SearchVector
 
 from .managers import QuestionManager, TagManager, LikeManager, AnswerManager
 
@@ -79,6 +81,12 @@ class Question(DefaultModel):
     class Meta:
         verbose_name = 'Вопрос'
         verbose_name_plural = 'Вопросы'
+        indexes = [
+            GinIndex(
+                SearchVector('title', 'content', config='russian'),
+                name='question_search_vector_idx'
+            )
+        ]
 
 
 class Answer(DefaultModel):
