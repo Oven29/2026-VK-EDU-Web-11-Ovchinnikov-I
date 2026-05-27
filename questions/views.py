@@ -15,6 +15,7 @@ def index(request):
     page_obj = paginate(Question.objects.new(request.user), request)
     context = {
         'questions': page_obj,
+        'title': 'Новые вопросы',
     }
 
     return render(request, 'questions/index.html', context)
@@ -67,7 +68,7 @@ def tag(request, tag: str):
     page_obj = paginate(Question.objects.by_tag(tag_obj.name, request.user), request)
     context = {
         'questions': page_obj,
-        'title': f'Tag: {tag_obj}',
+        'title': f'Тег: {tag_obj}',
     }
 
     return render(request, 'questions/index.html', context)
@@ -77,7 +78,7 @@ def hot(request):
     page_obj = paginate(Question.objects.hot(request.user), request)
     context = {
         'questions': page_obj,
-        'title': 'Hot Questions',
+        'title': 'Популярные вопросы',
     }
 
     return render(request, 'questions/index.html', context)
@@ -88,7 +89,7 @@ def user_questions(request, username: str):
     page_obj = paginate(Question.objects.by_author(user.id, request.user), request)
     context = {
         'questions': page_obj,
-        'title': f'{username}\'s questions',
+        'title': f'Вопросы пользователя {username}',
     }
 
     return render(request, 'questions/index.html', context)

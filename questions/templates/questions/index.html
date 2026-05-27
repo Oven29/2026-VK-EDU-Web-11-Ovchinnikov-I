@@ -6,20 +6,10 @@
 
 {% block content %}
 <div class="d-flex align-items-baseline mb-4">
-    <ul class="nav nav-pills mb-4">
-        <li class="nav-item">
-            <a class="nav-link {% if request.resolver_match.url_name == 'index' %}active{% endif %}"
-                href="{% url 'index' %}">
-                Новые вопросы
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link {% if request.resolver_match.url_name == 'hot' %}active{% endif %}"
-                href="{% url 'hot' %}">
-                Топовые вопросы
-            </a>
-        </li>
-    </ul>
+    <h2 class="me-3">{{ title }}</h2>
+    {% if request.resolver_match.url_name != 'hot' %}
+    <a href="{% url 'hot' %}" class="text-decoration-none"><u>Новые вопросы</u></a>
+    {% endif %}
 </div>
 
 <!-- вопросы -->
@@ -37,10 +27,10 @@
             <p class="text-muted question-content">{{ q.content }}</p>
             <div class="d-flex align-items-center mt-3 flex-wrap gap-1">
                 <a href="{% url 'question' q.id %}" class="me-3 text-decoration-underline">
-                    answers ({{ q.answers_count }})
+                    ответов ({{ q.answers_count }})
                 </a>
                 {% if q.tags.all %}
-                <span class="text-muted me-2">Tags:</span>
+                <span class="text-muted me-2">Теги:</span>
                 {% for tag in q.tags.all %}
                 <a href="{% url 'tag' tag.name  %}" class="me-2 tag">{{ tag }}</a>
                 {% endfor %}
