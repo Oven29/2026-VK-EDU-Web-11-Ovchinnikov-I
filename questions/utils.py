@@ -13,7 +13,7 @@ CACHE_KEY_BEST_MEMBERS = 'best_members'
 CACHE_TIMEOUT = 3600 * 24
 
 
-def paginate(objects_list, request, per_page=20):
+def paginate(objects_list, request, per_page=10):
     paginator = Paginator(objects_list, per_page)
 
     page_num = request.GET.get('page', 1)

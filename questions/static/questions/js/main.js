@@ -175,6 +175,9 @@ $(document).ready(function () {
                     if (toastEl) {
                         const toast = new bootstrap.Toast(toastEl);
                         toast.show();
+                        setTimeout(() => {
+                            toast.hide();
+                        }, 5000);
                     }
                 }
             }).on('subscribing', function (ctx) {
