@@ -17,3 +17,5 @@ media/
 .env
 .env.*
 !.env.example
+
+centrifugo_config.json

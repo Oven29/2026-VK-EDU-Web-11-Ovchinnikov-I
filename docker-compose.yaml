@@ -80,9 +80,6 @@ services:
       - "8010:8000"
     volumes:
       - ./centrifugo_config.json:/centrifugo/config.json
-    environment:
-      CENTRIFUGO_TOKEN_HMAC_SECRET_KEY: ${CENTRIFUGO_SECRET}
-      CENTRIFUGO_API_KEY: ${CENTRIFUGO_API_KEY}
     command: centrifugo -c config.json
     networks:
       - common
