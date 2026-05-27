@@ -26,6 +26,7 @@ pip install -r requirements.txt
     - `DB_NAME=`, `DB_USER=`, `DB_PASSWORD=`, `DB_HOST=`, `DB_PORT=` - параметры подключения к базе данных.
     - `REDIS_HOST=`, `REDIS_PORT=`, `REDIS_CACHE_DB=`, `REDIS_BROKER_DB=`, `REDIS_BEAT_DB=` - параметры подключения к Redis.
     - `CENTRIFUGO_SECRET=`, `CENTRIFUGO_API_KEY=`, `CENTRIFUGO_WS_URL=`, `CENTRIFUGO_API_URL=` - параметры подключения к Centrifugo.
+    - `EMAIL_HOST=`, `EMAIL_PORT=`, `EMAIL_USE_TLS=`, `DEFAULT_FROM_EMAIL=` - параметры подключения к почтовому серверу.
     - `DEBUG` - `true`, если вы хотите запустить Django в режиме отладки.
     - `SECRET_KEY` - секретный ключ для Django.
     - `ALLOWED_HOSTS` - список разрешенных хостов. (через запятую)
