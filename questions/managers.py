@@ -1,5 +1,5 @@
 from django.db import models, transaction
-from django.db.models import F, Value, OuterRef, Subquery, IntegerField, Sum
+from django.db.models import F, Value, OuterRef, Subquery, IntegerField, Sum, Q
 
 
 class QuestionManager(models.Manager):
@@ -7,9 +7,10 @@ class QuestionManager(models.Manager):
         """Приватный метод для базовой настройки QuerySet"""
         return (
             self.get_queryset()
+            .filter(is_active=True)
             .select_related('author', 'author__profile')
             .prefetch_related('tags')
-            .annotate(answers_count=models.Count('answers', distinct=True))
+            .annotate(answers_count=models.Count('answers', filter=Q(answers__is_active=True), distinct=True))
         )
 
     def new(self, user=None):
@@ -73,7 +74,7 @@ class LikeManager(models.Manager):
 
 class AnswerManager(models.Manager):
     def with_user_vote(self, user):
-        qs = self.get_queryset().select_related('author', 'author__profile')
+        qs = self.get_queryset().filter(is_active=True).select_related('author', 'author__profile')
         if user is None or not user.is_authenticated:
             return qs.annotate(user_vote=Value(0, output_field=IntegerField()))
             
@@ -90,7 +91,7 @@ class AnswerManager(models.Manager):
 
     def toggle_correct(self, user, answer_id):
         # Need to fetch the object here to check permissions
-        answer = self.get_queryset().select_related('question').get(pk=answer_id)
+        answer = self.get_queryset().filter(is_active=True).select_related('question').get(pk=answer_id)
         
         if user != answer.question.author:
             return False, 'Not authorized'

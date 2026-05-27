@@ -101,7 +101,7 @@ def vote_question(request):
     vote_type = request.POST.get('type')
     value = 1 if vote_type == 'up' else -1
     
-    question_obj = get_object_or_404(Question, pk=question_id)
+    question_obj = get_object_or_404(Question.objects.filter(is_active=True), pk=question_id)
     rating = QuestionLike.objects.toggle_vote(request.user, question_obj, value)
     
     return JsonResponse({'rating': rating})
@@ -114,7 +114,7 @@ def vote_answer(request):
     vote_type = request.POST.get('type')
     value = 1 if vote_type == 'up' else -1
     
-    answer_obj = get_object_or_404(Answer, pk=answer_id)
+    answer_obj = get_object_or_404(Answer.objects.filter(is_active=True), pk=answer_id)
     rating = AnswerLike.objects.toggle_vote(request.user, answer_obj, value)
     
     return JsonResponse({'rating': rating})
