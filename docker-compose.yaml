@@ -72,6 +72,18 @@ services:
       - db
       - redis
 
+  centrifugo:
+    image: centrifugo/centrifugo:v5
+    container_name: IvanAsk_centrifugo
+    restart: unless-stopped
+    ports:
+      - "8010:8000"
+    volumes:
+      - ./centrifugo_config.json:/centrifugo/config.json
+    command: centrifugo -c config.json
+    networks:
+      - common
+
 volumes:
   django_media:
   db-data:

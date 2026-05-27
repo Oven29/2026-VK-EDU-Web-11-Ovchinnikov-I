@@ -127,8 +127,13 @@ CELERY_RESULT_BACKEND = f"redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_BEAT_DB}"
 CELERY_BEAT_SCHEDULER = "redbeat.RedBeatScheduler"
 CELERY_REDBEAT_REDIS_URL = f"redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_BEAT_DB}"
 
+# Centrifugo real-time settings
+CENTRIFUGO_URL = env("CENTRIFUGO_URL", default="http://localhost:8010")
+CENTRIFUGO_API_KEY = env("CENTRIFUGO_API_KEY")
+CENTRIFUGO_SECRET = env("CENTRIFUGO_SECRET")
 
 CELERY_BEAT_SCHEDULE = {
+
     'update-popular-tags-every-hour': {
         'task': 'questions.tasks.update_popular_tags',
         'schedule': 3600.0,  # every hour
