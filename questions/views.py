@@ -185,3 +185,28 @@ def search_api(request):
     ).filter(search=query).values('id', 'title')[:15]
 
     return JsonResponse(list(results), safe=False)
+
+
+def search(request):
+    """
+    View for displaying full-text search results on a separate page.
+    """
+    query_text = request.GET.get('q', '')
+
+    if query_text:
+        vector = SearchVector('title', 'content', config='russian')
+        query = SearchQuery(query_text, config='russian')
+        # Use with_user_vote for consistency with other listing views
+        questions_qs = Question.objects.with_user_vote(request.user).annotate(
+            search=vector
+        ).filter(search=query)
+    else:
+        questions_qs = Question.objects.none()
+
+    page_obj = paginate(questions_qs, request)
+    context = {
+        'questions': page_obj,
+        'title': f'Результаты поиска: {query_text}',
+    }
+
+    return render(request, 'questions/index.html', context)

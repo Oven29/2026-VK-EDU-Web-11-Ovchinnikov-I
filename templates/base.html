@@ -21,11 +21,12 @@
                 Ivan Ask
             </a>
 
-            <div class="d-flex flex-grow-1 mx-4 position-relative">
-                <input id="search-input" class="form-control me-2" type="search" placeholder="Поиск" autocomplete="off">
+            <form action="{% url 'search' %}" method="get" class="d-flex flex-grow-1 mx-4 position-relative">
+                <input id="search-input" name="q" class="form-control me-2" type="search" placeholder="Поиск"
+                    autocomplete="off" value="{{ request.GET.q }}">
                 <div id="search-results"></div>
                 <button class="btn btn-outline-primary" type="submit">Найти</button>
-            </div>
+            </form>
             <div class="d-flex align-items-center">
                 <a href="{% url 'ask' %}" class="btn btn-primary me-3 fw-bold">СПРОСИТЬ!</a>
                 {% if user.is_authenticated %}
