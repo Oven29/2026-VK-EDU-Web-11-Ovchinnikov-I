@@ -128,7 +128,8 @@ CELERY_BEAT_SCHEDULER = "redbeat.RedBeatScheduler"
 CELERY_REDBEAT_REDIS_URL = f"redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_BEAT_DB}"
 
 # Centrifugo real-time settings
-CENTRIFUGO_URL = env("CENTRIFUGO_URL", default="http://localhost:8010")
+CENTRIFUGO_WS_URL = env("CENTRIFUGO_WS_URL", default="ws://localhost:8010/connection/websocket")
+CENTRIFUGO_API_URL = env("CENTRIFUGO_API_URL", default="http://localhost:8010/api")
 CENTRIFUGO_API_KEY = env("CENTRIFUGO_API_KEY")
 CENTRIFUGO_SECRET = env("CENTRIFUGO_SECRET")
 

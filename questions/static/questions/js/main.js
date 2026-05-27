@@ -114,7 +114,7 @@ $(document).ready(function () {
     const questionId = $answersList.data('question-id');
 
     if (centrifugoUrl && centrifugoToken && questionId) {
-        const centrifuge = new Centrifuge(`${centrifugoUrl}/connection/websocket`, {
+        const centrifuge = new Centrifuge(centrifugoUrl, {
             token: centrifugoToken
         });
 

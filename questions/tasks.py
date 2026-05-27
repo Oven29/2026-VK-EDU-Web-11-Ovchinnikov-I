@@ -23,7 +23,7 @@ def publish_answer_to_centrifugo(question_id: int, answer_data: dict):
     Publishes a new answer message to the specific question channel in Centrifugo.
     """
     client = Client(
-        settings.CENTRIFUGO_URL + "/api",
+        settings.CENTRIFUGO_API_URL,
         api_key=settings.CENTRIFUGO_API_KEY,
         timeout=10
     )
