@@ -6,6 +6,8 @@
 ![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)
 ![Django](https://img.shields.io/badge/django-%23092e20.svg?style=for-the-badge&logo=django&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/postgres-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white)
+![Redis](https://img.shields.io/badge/redis-%23DD0031.svg?style=for-the-badge&logo=redis&logoColor=white)
+![Celery](https://img.shields.io/badge/celery-%2337814A.svg?style=for-the-badge&logo=celery&logoColor=white)
 ![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)
 ![Bootstrap](https://img.shields.io/badge/bootstrap-%238511FA.svg?style=for-the-badge&logo=bootstrap&logoColor=white)
 ![jQuery](https://img.shields.io/badge/jquery-%230769AD.svg?style=for-the-badge&logo=jquery&logoColor=white)
@@ -19,7 +21,7 @@ pip install -r requirements.txt
 ```
 
 ### Настройка `.env`
-Пример `.env` файла в `example.env`
+Пример `.env` файла в `.env.example`. Для работы Celery и Кэша необходимо настроить параметры Redis.
 
 ### Выполнение миграций
 ```sh
@@ -36,17 +38,21 @@ make run
 ```
 Сервер запустится на http://127.0.0.1:8000
 
+### Запуск Celery (Локально)
+Для работы фоновых задач и периодического обновления кэша (популярные теги/пользователи):
+```sh
+# Запуск воркера
+make celery-worker
+# Запуск планировщика (beat)
+make celery-beat
+```
+
 ### Запуск через docker
-Также можно запустить через Docker. База сама поднимается и запускается
+Самый простой способ запустить всё сразу (Django + Postgres + Redis + Celery Worker/Beat):
 ```sh
 docker compose up -d --build
 # остановить
 docker compose down
-```
-Если нужно запустить именно приложеение (без бд и прочей инфрастуктуры), то
-```sh
-docker build -t ivan_ask .
-docker run -p 8000:8000 ivan_ask
 ```
 
 ### Вставка "тестовых" данных в бд
