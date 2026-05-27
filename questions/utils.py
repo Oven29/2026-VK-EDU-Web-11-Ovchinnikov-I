@@ -41,7 +41,6 @@ def get_best_members(force_update=False):
         profiles = Profile.objects.best()
         data = []
         for profile in profiles:
-            print(profile, name_filter(profile.user))
             data.append({
                 'name': name_filter(profile.user),
                 'username': profile.user.username,
