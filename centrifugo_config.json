@@ -1,6 +1,4 @@
 {
-  "token_hmac_secret_key": "centrifugo_hmac_secret_for_jwt",
-  "api_key": "centrifugo_api_key_for_backend_communication",
   "namespaces": [
     {
       "name": "questions",
