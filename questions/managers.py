@@ -1,5 +1,5 @@
 from django.db import models, transaction
-from django.db.models import F, Value, OuterRef, Subquery, IntegerField
+from django.db.models import F, Value, OuterRef, Subquery, IntegerField, Sum
 
 
 class QuestionManager(models.Manager):
@@ -57,17 +57,17 @@ class LikeManager(models.Manager):
         
         if not created:
             if like.value == value:
-                like.delete()
-                obj.rating = F('rating') - value
+                # Если нажали на ту же кнопку, убираем голос
+                like.value = 0
             else:
+                # Если нажали на противоположную кнопку, меняем голос
                 like.value = value
                 like.save()
-                obj.rating = F('rating') + 2 * value
-        else:
-            obj.rating = F('rating') + value
-            
-        obj.save()
-        obj.refresh_from_db()
+
+        rating_agg = self.filter(**{lookup_field: obj}).aggregate(total=Sum('value'))
+        obj.rating = rating_agg['total'] or 0
+        obj.save(update_fields=['rating'])
+
         return obj.rating
 
 
