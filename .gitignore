@@ -19,3 +19,6 @@ media/
 !.env.example
 
 centrifugo_config.json
+
+# Django static files collected for production
+/static/
