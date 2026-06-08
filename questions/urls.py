@@ -7,4 +7,5 @@ urlpatterns = [
     path('ask/', views.ask, name='ask'),
     path('tag/<str:tag>/', views.tag, name='tag'),
     path('hot/', views.hot, name='hot'),
+    path('user/<str:username>/', views.user_questions, name='user_questions'),
 ]

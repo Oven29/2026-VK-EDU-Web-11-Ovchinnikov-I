@@ -1,0 +1,8 @@
+{% extends 'errors/base_error.html' %}
+
+{% block title %}{{ block.super }} 404 Page not found{% endblock %}
+{% block error_code %}404{% endblock %}
+{% block error_title %}Страница не найдена{% endblock %}
+{% block error_message %}
+Похоже запрашиваемой страницы не существует или она была удалена
+{% endblock %}
