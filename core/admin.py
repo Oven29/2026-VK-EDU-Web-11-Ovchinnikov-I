@@ -22,5 +22,6 @@ admin.site.register(User, CustomUserAdmin)
 @admin.register(Profile)
 class ProfileAdmin(admin.ModelAdmin):
     list_display = ('user', 'photo')
+    list_select_related = ('user',)
     search_fields = ('user__username', 'user__email')
     raw_id_fields = ('user',)

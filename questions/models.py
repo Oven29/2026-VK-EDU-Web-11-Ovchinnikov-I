@@ -1,19 +1,42 @@
 import re
 
-from django.db import models
+from django.db import models, transaction
 from django.contrib.auth.models import User
 
-from .managers import QuestionManager, TagManager
+from .managers import QuestionManager, TagManager, LikeManager, AnswerManager
+
+
+class DefaultModel(models.Model):
+    """Abstract base model with common fields."""
+
+    updated_at = models.DateTimeField(
+        auto_now=True,
+        verbose_name='Обновлено в'
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name='Создано в'
+    )
+    is_active = models.BooleanField(
+        default=True,
+        verbose_name='Активно?'
+    )
+
+    class Meta:
+        abstract = True
 
 
 class Tag(models.Model):
-    name = models.CharField(max_length=63, unique=True,
-                            db_index=True, verbose_name='Название')
+    name = models.CharField(
+        max_length=63,
+        unique=True,
+        db_index=True,
+        verbose_name='Название'
+    )
 
     objects = TagManager()
 
     def __str__(self):
-        # Отсекаю номер чтобы при тестовых данных это уродливо не выглядело
         return re.sub(r'_\d+$', '', self.name)
 
     class Meta:
@@ -21,16 +44,32 @@ class Tag(models.Model):
         verbose_name_plural = 'Теги'
 
 
-class Question(models.Model):
-    title = models.CharField(max_length=255, verbose_name='Заголовок')
-    content = models.TextField(verbose_name='Содержание')
+class Question(DefaultModel):
+    title = models.CharField(
+        max_length=255,
+        verbose_name='Заголовок'
+    )
+    content = models.TextField(
+        max_length=3000,
+        verbose_name='Содержание'
+    )
     author = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='questions', verbose_name='Автор')
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='questions',
+        verbose_name='Автор'
+    )
     tags = models.ManyToManyField(
-        Tag, blank=True, related_name='questions', verbose_name='Теги')
-    rating = models.IntegerField(default=0, verbose_name='Рейтинг')
-    created_at = models.DateTimeField(
-        auto_now_add=True, verbose_name='Дата создания')
+        Tag,
+        blank=True,
+        related_name='questions',
+        verbose_name='Теги'
+    )
+    rating = models.IntegerField(
+        default=0,
+        verbose_name='Рейтинг'
+    )
 
     objects = QuestionManager()
 
@@ -42,20 +81,57 @@ class Question(models.Model):
         verbose_name_plural = 'Вопросы'
 
 
-class Answer(models.Model):
-    content = models.TextField(verbose_name='Контент')
+class Answer(DefaultModel):
+    content = models.TextField(
+        max_length=3000,
+        verbose_name='Контент'
+    )
     author = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='answers', verbose_name='Автор')
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='answers',
+        verbose_name='Автор'
+    )
     question = models.ForeignKey(
-        Question, on_delete=models.CASCADE, related_name='answers', verbose_name='Вопрос')
+        Question,
+        on_delete=models.CASCADE,
+        related_name='answers',
+        verbose_name='Вопрос'
+    )
     is_correct = models.BooleanField(
-        default=False, verbose_name='Правильный ответ')
-    rating = models.IntegerField(default=0, verbose_name='Рейтинг')
-    created_at = models.DateTimeField(
-        auto_now_add=True, verbose_name='Дата создания')
+        default=False,
+        verbose_name='Правильный ответ'
+    )
+    rating = models.IntegerField(
+        default=0,
+        verbose_name='Рейтинг'
+    )
+
+    objects = AnswerManager()
 
     def __str__(self):
-        return f'Ответ на "{self.question.title}" от {self.author.username}'
+        return f'Ответ {self.id}'
+
+    @transaction.atomic
+    def save(self, *args, **kwargs):
+        is_new = self.pk is None
+        super().save(*args, **kwargs)
+        if is_new and self.author_id:
+            from core.models import Profile
+            profile = Profile.objects.filter(user_id=self.author_id).first()
+            if profile:
+                profile.sync_answer_cnt()
+
+    @transaction.atomic
+    def delete(self, *args, **kwargs):
+        author_id = self.author_id
+        super().delete(*args, **kwargs)
+        if author_id:
+            from core.models import Profile
+            profile = Profile.objects.filter(user_id=author_id).first()
+            if profile:
+                profile.sync_answer_cnt()
 
     class Meta:
         verbose_name = 'Ответ'
@@ -81,7 +157,11 @@ class LikeAbstract(models.Model):
         verbose_name='Значение'
     )
     created_at = models.DateTimeField(
-        auto_now_add=True, verbose_name='Дата создания')
+        auto_now_add=True,
+        verbose_name='Дата создания'
+    )
+
+    objects = LikeManager()
 
     class Meta:
         abstract = True

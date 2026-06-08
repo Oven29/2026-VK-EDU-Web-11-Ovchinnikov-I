@@ -76,6 +76,12 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'questions.context_processors.sidebar_data',
             ],
+            'libraries': {
+                'core_tags': 'core.templatetags.core_tags',
+            },
+            'builtins': [
+                'core.templatetags.core_tags',
+            ],
         },
     },
 ]
@@ -120,7 +126,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ru-ru'
 
 TIME_ZONE = 'UTC'
 
@@ -132,6 +138,32 @@ USE_TZ = True
 LOGIN_REDIRECT_URL = '/'
 LOGIN_URL = '/login/'
 
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '%(levelname)s %(asctime)s %(message)s'
+        },
+    },
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose'
+        },
+        'null': {
+            'class': 'logging.NullHandler',
+        },
+    },
+    'loggers': {
+        'django.db.backends': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': False,
+        }
+    },
+}
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/

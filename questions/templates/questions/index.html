@@ -5,10 +5,14 @@
 {% endif %}
 
 {% block content %}
-<div class="d-flex align-items-baseline mb-4">
-    <h2 class="me-3">{{ title }}</h2>
+<div class="d-flex align-items-baseline mb-4 gap-2">
+    <h3 class="me-3">{{ title }}</h3>
+    {% if request.resolver_match.url_name != 'index' %}
+    <a href="{% url 'hot' %}" class="text-decoration-none"><u>Новые вопросы</u></a>
+    {% endif %}
+
     {% if request.resolver_match.url_name != 'hot' %}
-    <a href="{% url 'hot' %}" class="text-decoration-none"><u>Hot Questions</u></a>
+    <a href="{% url 'hot' %}" class="text-decoration-none"><u>Топовые вопросы</u></a>
     {% endif %}
 </div>
 
@@ -17,7 +21,7 @@
 <div class="question-card">
     <div class="row g-3">
         <div class="col-auto text-center">
-            {% include 'questions/components/rating.html' with rating=q.rating %}
+            {% include 'questions/components/rating.html' with rating=q.rating id=q.id type='question' user_vote=q.user_vote %}
         </div>
 
         <div class="col">
@@ -27,22 +31,28 @@
             <p class="text-muted question-content">{{ q.content }}</p>
             <div class="d-flex align-items-center mt-3 flex-wrap gap-1">
                 <a href="{% url 'question' q.id %}" class="me-3 text-decoration-underline">
-                    answers ({{ q.answers_count }})
+                    ответов ({{ q.answers_count }})
                 </a>
-                <span class="text-muted me-2">Tags:</span>
+                {% if q.tags.all %}
+                <span class="text-muted me-2">Теги:</span>
                 {% for tag in q.tags.all %}
                 <a href="{% url 'tag' tag.name  %}" class="me-2 tag">{{ tag }}</a>
                 {% endfor %}
+                {% endif %}
             </div>
 
             <div class="d-flex justify-content-between align-items-center mt-3">
                 <div>
                     <small>
+                        {% if q.author %}
                         <a href="{% url 'user_questions' q.author.username %}" class="fw-medium">
-                            <img src="{{ q.author.profile.photo.url }}" alt="{{ q.author.name }}"
+                            <img src="{{ q.author.profile.photo.url }}" alt="{{ q.author|name }}"
                                 class="avatar-box-sm me-1 mb-2">
-                            {{ q.author.profile.name }}
+                            {{ q.author|name }}
                         </a>
+                        {% else %}
+                        <span class="text-muted">u/DELETED</span>
+                        {% endif %}
                     </small>
                 </div>
 

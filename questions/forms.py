@@ -1,4 +1,6 @@
 from django import forms
+from django.db import transaction
+
 from .models import Question, Answer, Tag
 
 
@@ -31,13 +33,13 @@ class QuestionForm(forms.ModelForm):
                 tag, created = Tag.objects.get_or_create(name=name)
                 question.tags.add(tag)
 
-    def save(self, commit=True, author=None):
+    def save(self, author, commit=True):
         question = super().save(commit=False)
-        if author:
-            question.author = author
+        question.author = author
         if commit:
-            question.save()
-            self._save_tags(question)
+            with transaction.atomic():
+                question.save()
+                self._save_tags(question)
         return question
 
 
@@ -57,12 +59,10 @@ class AnswerForm(forms.ModelForm):
             }),
         }
 
-    def save(self, commit=True, author=None, question=None):
+    def save(self, author, question, commit=True):
         answer = super().save(commit=False)
-        if author:
-            answer.author = author
-        if question:
-            answer.question = question
+        answer.author = author
+        answer.question = question
         if commit:
             answer.save()
         return answer

@@ -1,9 +1,9 @@
-<div class="vote-widget">
-      <span class="vote-btn vote-up {% if not user.is_authenticated %}disabled{% endif %}"
-            data-action="up"
-            {% if not user.is_authenticated %}title="Войдите, чтобы проголосовать" {% endif %}>+</span>
-      <div class="vote-count">{{ rating }}</div>
-      <span class="vote-btn vote-down {% if not user.is_authenticated %}disabled{% endif %}"
-            data-action="down"
-            {% if not user.is_authenticated %}title="Войдите, чтобы проголосовать" {% endif %}>-</span>
+<div class="vote-widget" data-id="{{ id }}" data-type="{{ type }}">
+    <span class="vote-btn vote-up {% if not user.is_authenticated %}disabled{% endif %} {% if user_vote == 1 %}active{% endif %}" 
+          data-action="up" 
+          {% if not user.is_authenticated %}title="Войдите, чтобы проголосовать"{% endif %}>+</span>
+    <div class="vote-count">{{ rating }}</div>
+    <span class="vote-btn vote-down {% if not user.is_authenticated %}disabled{% endif %} {% if user_vote == -1 %}active{% endif %}" 
+          data-action="down"
+          {% if not user.is_authenticated %}title="Войдите, чтобы проголосовать"{% endif %}>-</span>
 </div>

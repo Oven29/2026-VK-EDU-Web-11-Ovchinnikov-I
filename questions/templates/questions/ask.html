@@ -8,32 +8,7 @@
 <form method="post" action="{% url 'ask' %}" class="mt-4">
     {% csrf_token %}
     
-    {% if form.non_field_errors %}
-    <div class="alert alert-danger">
-        {% for error in form.non_field_errors %}
-        {{ error }}
-        {% endfor %}
-    </div>
-    {% endif %}
-
-    {% for field in form %}
-    <div class="row mb-3 align-items-center">
-        <label for="{{ field.id_for_label }}" class="col-sm-2 col-form-label fw-bold">{{ field.label }}</label>
-        <div class="col-sm-10">
-            {{ field }}
-            {% if field.help_text %}
-            <div class="form-text">{{ field.help_text }}</div>
-            {% endif %}
-            {% if field.errors %}
-            <div class="text-danger small">
-                {% for error in field.errors %}
-                {{ error }}
-                {% endfor %}
-            </div>
-            {% endif %}
-        </div>
-    </div>
-    {% endfor %}
+    {% include "core/includes/form_fields.html" with layout="horizontal" %}
 
     <div class="row mt-4">
         <div class="col-sm-10 offset-sm-2">
