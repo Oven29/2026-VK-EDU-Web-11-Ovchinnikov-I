@@ -21,10 +21,12 @@
                 Ivan Ask
             </a>
 
-            <div class="d-flex flex-grow-1 mx-4">
-                <input class="form-control me-2" type="search" placeholder="Поиск">
+            <form action="{% url 'search' %}" method="get" class="d-flex flex-grow-1 mx-4 position-relative">
+                <input id="search-input" name="q" class="form-control me-2" type="search" placeholder="Поиск"
+                    autocomplete="off" value="{{ request.GET.q }}">
+                <div id="search-results"></div>
                 <button class="btn btn-outline-primary" type="submit">Найти</button>
-            </div>
+            </form>
             <div class="d-flex align-items-center">
                 <a href="{% url 'ask' %}" class="btn btn-primary me-3 fw-bold">СПРОСИТЬ!</a>
                 {% if user.is_authenticated %}
@@ -63,7 +65,7 @@
                     <h3 class="sidebar-title">Популярные теги</h3>
                     <div class="tag-cloud fw-bold">
                         {% for tag in popular_tags %}
-                        <a href="{% url 'tag' tag.name %}" class="text-decoration-none tag">{{ tag }}</a>
+                        <a href="{% url 'tag' tag.name %}" class="text-decoration-none tag">{{ tag.name }}</a>
                         {% endfor %}
                     </div>
                 </div>
@@ -72,8 +74,8 @@
                     <h3 class="sidebar-title">Лучшие пользователи</h3>
                     <ul class="list-unstyled">
                         {% for member in best_members %}
-                        <li><a href="{% url 'user_questions' member.user.username %}" class="text-decoration-none">
-                                {{ member|name }}
+                        <li><a href="{% url 'user_questions' member.username %}" class="text-decoration-none">
+                                {{ member.name }}
                             </a>
                         </li>
                         {% endfor %}
@@ -90,6 +92,7 @@
     </footer>
 
     <script src="{% static 'questions/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{%  static 'questions/js/centrifuge.js' %}"></script>
     <script src="{% static 'questions/js/jquery-4.0.0.min.js' %}"></script>
     <script src="{% static 'questions/js/main.js' %}"></script>
 </body>

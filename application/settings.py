@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.postgres',
     'core',
     'questions',
 ]
@@ -103,6 +104,55 @@ DATABASES = {
     },
 }
 
+# Redis & Cache
+REDIS_HOST = env("REDIS_HOST", default="localhost")
+REDIS_PORT = env("REDIS_PORT", default="6379")
+REDIS_CACHE_DB = env("REDIS_CACHE_DB", default="0")
+REDIS_BROKER_DB = env("REDIS_BROKER_DB", default="1")
+REDIS_BEAT_DB = env("REDIS_BEAT_DB", default="2")
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": f"redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_CACHE_DB}",
+        "OPTIONS": {"CLIENT_CLASS": "django_redis.client.DefaultClient"},
+        "TIMEOUT": 60 * 10,
+    }
+}
+
+# Celery settings
+CELERY_BROKER_URL = f"redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_BROKER_DB}"
+CELERY_RESULT_BACKEND = f"redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_BEAT_DB}"
+
+# RedBeat settings
+CELERY_BEAT_SCHEDULER = "redbeat.RedBeatScheduler"
+CELERY_REDBEAT_REDIS_URL = f"redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_BEAT_DB}"
+
+# Centrifugo real-time settings
+CENTRIFUGO_WS_URL = env("CENTRIFUGO_WS_URL",
+                        default="ws://localhost:8010/connection/websocket")
+CENTRIFUGO_API_URL = env("CENTRIFUGO_API_URL",
+                         default="http://localhost:8010/api")
+CENTRIFUGO_API_KEY = env("CENTRIFUGO_API_KEY")
+CENTRIFUGO_SECRET = env("CENTRIFUGO_SECRET")
+
+CELERY_BEAT_SCHEDULE = {
+
+    'update-popular-tags-every-hour': {
+        'task': 'questions.tasks.update_popular_tags',
+        'schedule': 3600.0,  # every hour
+    },
+    'update-best-members-every-hour': {
+        'task': 'questions.tasks.update_best_members',
+        'schedule': 3600.0,  # every hour
+    },
+}
+
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = env("EMAIL_HOST", default="localhost")
+EMAIL_PORT = env.int("EMAIL_PORT", default=1025)
+EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS", default=False)
+DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default="noreply@ivanask.local")
 
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators

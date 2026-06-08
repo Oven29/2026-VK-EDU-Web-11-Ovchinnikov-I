@@ -1,3 +1,5 @@
+from datetime import timedelta
+from django.utils import timezone
 from django.db import models, transaction
 from django.db.models import F, Value, OuterRef, Subquery, IntegerField, Sum, Q
 
@@ -42,8 +44,10 @@ class QuestionManager(models.Manager):
 
 class TagManager(models.Manager):
     def popular(self):
+        three_months_ago = timezone.now() - timedelta(days=90)
         return self.annotate(
-            question_count=models.Count('questions')
+            question_count=models.Count('questions', filter=Q(
+                questions__created_at__gte=three_months_ago))
         ).order_by('-question_count')[:10]
 
 
@@ -51,11 +55,12 @@ class LikeManager(models.Manager):
     @transaction.atomic
     def toggle_vote(self, user, obj, value):
         # Determine if it's QuestionLike or AnswerLike
-        lookup_field = 'question' if hasattr(self.model, 'question') else 'answer'
+        lookup_field = 'question' if hasattr(
+            self.model, 'question') else 'answer'
         lookup = {lookup_field: obj, 'user': user}
-        
+
         like, created = self.get_or_create(**lookup, defaults={'value': value})
-        
+
         if not created:
             if like.value == value:
                 # Если нажали на ту же кнопку, убираем голос
@@ -66,7 +71,8 @@ class LikeManager(models.Manager):
                 like.value = value
                 like.save()
 
-        rating_agg = self.filter(**{lookup_field: obj}).aggregate(total=Sum('value'))
+        rating_agg = self.filter(
+            **{lookup_field: obj}).aggregate(total=Sum('value'))
         obj.rating = rating_agg['total'] or 0
         obj.save(update_fields=['rating'])
 
@@ -75,16 +81,17 @@ class LikeManager(models.Manager):
 
 class AnswerManager(models.Manager):
     def with_user_vote(self, user):
-        qs = self.get_queryset().filter(is_active=True).select_related('author', 'author__profile')
+        qs = self.get_queryset().filter(
+            is_active=True).select_related('author', 'author__profile')
         if user is None or not user.is_authenticated:
             return qs.annotate(user_vote=Value(0, output_field=IntegerField()))
-            
+
         from .models import AnswerLike
         vote_subquery = AnswerLike.objects.filter(
-            user=user, 
+            user=user,
             answer=OuterRef('pk')
         ).values('value')
-        
+
         return qs.annotate(user_vote=Subquery(vote_subquery))
 
     def get_for_question(self, question, user=None):
@@ -92,11 +99,12 @@ class AnswerManager(models.Manager):
 
     def toggle_correct(self, user, answer_id):
         # Need to fetch the object here to check permissions
-        answer = self.get_queryset().filter(is_active=True).select_related('question').get(pk=answer_id)
-        
+        answer = self.get_queryset().filter(
+            is_active=True).select_related('question').get(pk=answer_id)
+
         if user != answer.question.author:
             return False, 'Not authorized'
-        
+
         with transaction.atomic():
             if answer.is_correct:
                 answer.is_correct = False

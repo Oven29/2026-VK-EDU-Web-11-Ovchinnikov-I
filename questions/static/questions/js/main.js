@@ -16,6 +16,7 @@ const getCookie = (name) => {
 const csrftoken = getCookie('csrftoken');
 
 $(document).ready(function () {
+    // Vote logic
     $('.vote-btn').on('click', function () {
         const $this = $(this);
         const action = $this.data('action');
@@ -35,7 +36,6 @@ $(document).ready(function () {
             url: url,
             method: 'POST',
             data: {
-                'id': objectId,
                 'type': action
             },
             headers: {
@@ -44,7 +44,6 @@ $(document).ready(function () {
             success: function (data) {
                 $counter.text(data.rating);
 
-                // Optional: toggle active classes for visual feedback
                 const $opposed = $this.siblings('.vote-btn');
                 if ($this.hasClass('active')) {
                     $this.removeClass('active');
@@ -62,6 +61,7 @@ $(document).ready(function () {
         });
     });
 
+    // Mark correct logic
     $('.correct-checkbox').on('change', function () {
         const $this = $(this);
         const answerId = $this.val();
@@ -76,7 +76,6 @@ $(document).ready(function () {
             },
             success: function (data) {
                 if (data.is_correct) {
-                    // Remove correct status from other cards
                     $('.answer-card').removeClass('correct-answer');
                     $('.form-check-label').removeClass('correct-label');
                     $('.correct-checkbox').not($this).prop('checked', false);
@@ -90,12 +89,12 @@ $(document).ready(function () {
             },
             error: function (xhr) {
                 console.error('Error marking correct:', xhr.responseJSON);
-                // Revert checkbox state on error
                 $this.prop('checked', !$this.prop('checked'));
             }
         });
     });
 
+    // Editor symbol counter
     $('#editor').on('input', function () {
         const text = $(this).val();
         const countSymbols = text.length;
@@ -107,4 +106,141 @@ $(document).ready(function () {
 
         $counter.text(`${countSymbols}/3000`);
     }).trigger('input');
+
+    // Search autocomplete logic
+    const $searchInput = $('#search-input');
+    const $searchResults = $('#search-results');
+
+    const debounce = (func, delay) => {
+        let timeout;
+        return function () {
+            const context = this;
+            const args = arguments;
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(context, args), delay);
+        };
+    };
+
+    const handleSearch = debounce(function () {
+        const query = $searchInput.val().trim();
+
+        if (query.length < 3) {
+            $searchResults.empty().hide();
+            return;
+        }
+
+        fetch(`/api/search/?q=${encodeURIComponent(query)}`)
+            .then(response => response.json())
+            .then(data => {
+                $searchResults.empty();
+
+                if (data.length > 0) {
+                    data.forEach(item => {
+                        const $link = $('<a>')
+                            .attr('href', `/question/${item.id}/`)
+                            .text(item.title);
+                        $searchResults.append($link);
+                    });
+                    $searchResults.show();
+                } else {
+                    $searchResults.hide();
+                }
+            })
+            .catch(error => {
+                console.error('Search error:', error);
+                $searchResults.hide();
+            });
+    }, 300);
+
+    $searchInput.on('input', handleSearch);
+
+    // Close search results when clicking outside
+    $(document).on('click', function (e) {
+        if (!$(e.target).closest('.position-relative').length) {
+            $searchResults.hide();
+        }
+    });
+
+    // Centrifugo Real-time updates
+    const $answersList = $('.answers-list');
+    if ($answersList.length) {
+        const centrifugoUrl = $answersList.data('centrifugo-url');
+        const centrifugoToken = $answersList.data('centrifugo-token');
+        const questionId = $answersList.data('question-id');
+        const currentPage = parseInt($answersList.data('page')) || 1;
+
+        if (centrifugoUrl && centrifugoToken && questionId) {
+            const centrifuge = new Centrifuge(`${centrifugoUrl}`, {
+                token: centrifugoToken
+            });
+
+            centrifuge.on('connecting', ctx => {
+                console.log(`connecting: ${ctx.code}, ${ctx.reason}`);
+            }).on('connected', ctx => {
+                console.log(`connected over ${ctx.transport}`);
+            }).on('disconnected', ctx => {
+                console.log(`disconnected: ${ctx.code}, ${ctx.reason}`);
+            }).connect();
+
+            const sub = centrifuge.newSubscription(`questions:${questionId}`);
+
+            sub.on('publication', ctx => {
+                const data = ctx.data;
+
+                if (currentPage === 1) {
+                    // Remove empty state if present
+                    $('.empty-state').remove();
+
+                    // Clone template
+                    const $template = $('#answer-template .answer-card').clone();
+
+                    // Fill data
+                    $template.attr('id', `answer-${data.id}`);
+                    $template.find('.vote-widget').attr('data-id', data.id);
+                    $template.find('.answer-content-placeholder').text(data.content);
+
+                    const $checkbox = $template.find('.correct-checkbox-placeholder');
+                    $checkbox.attr('id', `correct${data.id}`).val(data.id);
+                    $template.find('label').attr('for', `correct${data.id}`);
+
+                    const $authorLink = $template.find('.answer-author-link');
+                    $authorLink.attr('href', `/user/${data.author.username}/`);
+                    $template.find('.answer-author-name').text(data.author.name);
+
+                    if (data.author.profile_photo_url) {
+                        $template.find('.answer-author-avatar').attr('src', data.author.profile_photo_url).show();
+                    }
+
+                    $template.find('.answer-date-placeholder').text(data.created_at);
+
+                    // Insert into DOM
+                    const $nav = $('.pagination').closest('nav');
+                    if ($nav.length) {
+                        $template.insertBefore($nav);
+                    } else {
+                        $answersList.append($template);
+                    }
+
+                    // Small fade-in effect
+                    $template.hide().fadeIn(500);
+                } else {
+                    // Show Bootstrap Toast on other pages
+                    const toastEl = document.getElementById('new-answer-toast');
+                    if (toastEl) {
+                        const toast = new bootstrap.Toast(toastEl);
+                        toast.show();
+                        setTimeout(() => {
+                            toast.hide();
+                        }, 5000);
+                    }
+                }
+            }).on('subscribing', function (ctx) {
+                console.log(`subscribing: ${ctx.code}, ${ctx.reason}`);
+            }).on('subscribed', function (ctx) {
+                console.log('subscribed', ctx);
+            }).on('unsubscribed', function (ctx) {
+                console.log(`unsubscribed: ${ctx.code}, ${ctx.reason}`);
+            }).subscribe();
+        }
+    }
 });

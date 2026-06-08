@@ -1,4 +1,29 @@
 services:
+  db:
+    image: postgres:15
+    container_name: IvanAsk_postgres
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    restart: unless-stopped
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    networks:
+      - common
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: IvanAsk_redis
+    restart: unless-stopped
+    networks:
+      - common
+
   app:
     container_name: IvanAsk
     build:
@@ -10,24 +35,71 @@ services:
     volumes:
       - .:/app
       - django_media:/app/media
+    env_file:
+      - .env
     ports:
       - "8000:8000"
     networks:
       - common
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
 
-  db:
-    image: postgres
-    container_name: IvanAsk_postgres
-    environment:
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_DB: ${DB_NAME}
-      POSTGRES_PORT: ${DB_PORT}
+  worker:
+    container_name: IvanAsk_worker
+    build:
+      context: .
     restart: unless-stopped
+    command: celery -A application worker --loglevel=info
     volumes:
-      - db-data:/var/lib/postgresql/data
+      - .:/app
+    env_file:
+      - .env
+    networks:
+      - common
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
+  beat:
+    container_name: IvanAsk_beat
+    build:
+      context: .
+    restart: unless-stopped
+    command: celery -A application beat --loglevel=info
+    volumes:
+      - .:/app
+    env_file:
+      - .env
+    networks:
+      - common
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
+  centrifugo:
+    image: centrifugo/centrifugo:v5
+    container_name: IvanAsk_centrifugo
+    restart: unless-stopped
+    ports:
+      - "8010:8000"
+    volumes:
+      - ./centrifugo_config.json:/centrifugo/config.json
+    command: centrifugo -c config.json
+    networks:
+      - common
+
+  maildev:
+    image: maildev/maildev
+    ports:
+      - "1080:1080"
+      - "1025:1025"
     networks:
       - common
 

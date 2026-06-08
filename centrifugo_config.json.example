@@ -1,0 +1,29 @@
+{
+  "client": {
+    "token": {
+      "hmac_secret_key": "HMAC_SECRET_KEY"
+    },
+    "allowed_origins": [
+      "http://localhost:8000"
+    ]
+  },
+  "http_api": {
+    "key": "HTTP_API_KEY"
+  },
+  "admin": {
+    "enabled": true,
+    "password": "PASSWORD",
+    "secret": "ADMIN SECRET"
+  },
+  "channel": {
+    "namespaces": [
+      {
+        "name": "questions",
+        "allow_subscribe_for_client": true
+      }
+    ],
+    "without_namespace": {
+      "allow_subscribe_for_client": false
+    }
+  }
+}
