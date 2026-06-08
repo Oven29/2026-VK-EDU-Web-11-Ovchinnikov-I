@@ -154,6 +154,11 @@ a:hover {
     color: var(--bs-danger) !important;
 }
 
+.vote-btn.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
 .avatar-box,
 .avatar-box-sm {
     object-fit: cover;

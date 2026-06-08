@@ -11,6 +11,10 @@ $(document).ready(function () {
         const $counter = $container.find('.vote-count');
         const $opposed = $this.siblings('.vote-btn');
 
+        if ($this.hasClass('disabled')) {
+            return;
+        }
+
         let currentVotes = parseInt($counter.text());
 
         if ($this.hasClass('active')) {

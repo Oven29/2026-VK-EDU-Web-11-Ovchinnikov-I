@@ -27,18 +27,27 @@
             </div>
             <div class="d-flex align-items-center">
                 <a href="{% url 'ask' %}" class="btn btn-primary me-3 fw-bold">ASK!</a>
+                {% if user.is_authenticated %}
                 <div class="d-flex align-items-center">
-                    <a class="me-2" href="{{ me.profile_path }}">
-                        <img src="{{ me.profile_photo }}" alt="{{ me.name }}" class="avatar-box">
+                    <a class="me-2" href="{% url 'profile' %}">
+                        {% if user.profile.photo %}
+                        <img src="{{ user.profile.photo.url }}" alt="{{ user.username }}" class="avatar-box">
+                        {% endif %}
                     </a>
                     <div>
-                        <div class="fw-bold" style="font-size: 0.85rem;">Ivan Ovchinnikov</div>
+                        <div class="fw-bold" style="font-size: 0.85rem;">{{ user.username }}</div>
                         <div style="font-size: 0.75rem;">
-                            <a href="{% url 'profile' %}" class="text-decoration-none">settings</a>
-                            <a href="#" class="text-decoration-none ms-1 text-danger">log out</a>
+                            <a href="{% url 'profile' %}" class="text-decoration-none">настройки</a>
+                            <a href="{% url 'logout' %}" class="text-decoration-none ms-1 text-danger">выход</a>
                         </div>
                     </div>
                 </div>
+                {% else %}
+                <div class="d-flex align-items-center">
+                    <a href="{% url 'login' %}" class="btn btn-outline-secondary me-2">Войти</a>
+                    <a href="{% url 'signup' %}" class="btn btn-outline-primary">Регистрация</a>
+                </div>
+                {% endif %}
             </div>
         </div>
     </nav>
@@ -63,9 +72,9 @@
                     <h3 class="sidebar-title">Best Members</h3>
                     <ul class="list-unstyled">
                         {% for member in best_members %}
-                        <li>
-                            <a href="{% url 'user_questions' member.user.username %}"
-                                class="text-decoration-none">{{ member.name }}</a>
+                        <li><a href="{% url 'user_questions' member.user.username %}" class="text-decoration-none">
+                                {{member.name }}
+                            </a>
                         </li>
                         {% endfor %}
                     </ul>

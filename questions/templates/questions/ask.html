@@ -1,39 +1,43 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ block.super }}: New Question{% endblock %}
+{% block title %}Новый вопрос - Ivan Ask{% endblock %}
 
 {% block content %}
-<h2 class="mb-4">New Question</h2>
+<h2 class="mb-4">Задать вопрос</h2>
 
-<form action="{% url 'ask' %}" class="mt-4" >
+<form method="post" action="{% url 'ask' %}" class="mt-4">
+    {% csrf_token %}
+    
+    {% if form.non_field_errors %}
+    <div class="alert alert-danger">
+        {% for error in form.non_field_errors %}
+        {{ error }}
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% for field in form %}
     <div class="row mb-3 align-items-center">
-        <label class="col-sm-2 col-form-label fw-bold">Title</label>
+        <label for="{{ field.id_for_label }}" class="col-sm-2 col-form-label fw-bold">{{ field.label }}</label>
         <div class="col-sm-10">
-            <input type="text" class="form-control" placeholder="How to build a moon park?">
-        </div>
-    </div>
-
-    <div class="row mb-3">
-        <label class="col-sm-2 col-form-label fw-bold">Text</label>
-        <div class="col-sm-10">
-            <textarea id="editor" class="form-control" rows="8" placeholder="Реально как? Вообще ноль идей"></textarea>
-            <div class="form-text">Describe your problem in detail.
-                <span id="count-symbols">0/3000</span>
+            {{ field }}
+            {% if field.help_text %}
+            <div class="form-text">{{ field.help_text }}</div>
+            {% endif %}
+            {% if field.errors %}
+            <div class="text-danger small">
+                {% for error in field.errors %}
+                {{ error }}
+                {% endfor %}
             </div>
+            {% endif %}
         </div>
     </div>
+    {% endfor %}
 
-    <div class="row mb-4 align-items-center">
-        <label class="col-sm-2 col-form-label fw-bold">Tags</label>
-        <div class="col-sm-10">
-            <input type="text" class="form-control" placeholder="moon, park, puzzle">
-            <div class="form-text">Comma separated tags.</div>
-        </div>
-    </div>
-
-    <div class="row">
+    <div class="row mt-4">
         <div class="col-sm-10 offset-sm-2">
-            <button type="submit" class="btn btn-primary px-4">ASK!</button>
+            <button type="submit" class="btn btn-primary px-4">Опубликовать!</button>
         </div>
     </div>
 </form>
